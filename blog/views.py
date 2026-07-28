@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from .models import Post, Category
 from .forms import PostForm, CommentForm
 from django.db.models import Q
@@ -129,5 +131,14 @@ def post_comments(request, slug):
             comment.author = request.user
             comment.save()
             return redirect('post_detail', slug=post.slug)
+
+
+# ── 一次性设置：创建管理员（部署后访问 /setup/）──────────────────
+def setup_admin(request):
+    """访问此页面自动创建管理员账号，用完后删掉此函数"""
+    if User.objects.filter(username='admin').exists():
+        return HttpResponse('管理员已存在：admin / admin123')
+    User.objects.create_superuser('admin', 'admin@example.com', 'admin123')
+    return HttpResponse('管理员创建成功！<br>账号：admin<br>密码：admin123<br><a href="/admin/">去后台</a>')
 
 
