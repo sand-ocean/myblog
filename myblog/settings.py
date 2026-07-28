@@ -75,6 +75,12 @@ DATABASES = {
     )
 }
 
+# Neon PostgreSQL 需要 SSL 连接
+if os.environ.get('DATABASE_URL', '').startswith('postgres'):
+    DATABASES['default']['OPTIONS'] = {
+        'sslmode': 'require',
+    }
+
 # ── 密码验证 ──────────────────
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
