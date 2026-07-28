@@ -133,12 +133,33 @@ def post_comments(request, slug):
             return redirect('post_detail', slug=post.slug)
 
 
-# ── 一次性设置：创建管理员（部署后访问 /setup/）──────────────────
+# ── 一次性设置：初始化管理员+默认分类（部署后访问 /setup/）──────────────────
 def setup_admin(request):
-    """访问此页面自动创建管理员账号，用完后删掉此函数"""
+    """每次部署后访问此页面，自动建管理员和默认分类"""
+    msg = []
+
+    # 建管理员
     if User.objects.filter(username='admin').exists():
-        return HttpResponse('管理员已存在：admin / admin123')
-    User.objects.create_superuser('admin', 'admin@example.com', 'admin123')
-    return HttpResponse('管理员创建成功！<br>账号：admin<br>密码：admin123<br><a href="/admin/">去后台</a>')
+        msg.append('管理员已存在')
+    else:
+        User.objects.create_superuser('admin', 'admin@example.com', 'admin123')
+        msg.append('管理员创建成功')
+
+    # 建默认分类
+    defaults = [
+        ('python', 'Python'),
+        ('django', 'Django'),
+        ('life', '生活随笔'),
+    ]
+    for slug, name in defaults:
+        obj, created = Category.objects.get_or_create(slug=slug, defaults={'name': name})
+        if created:
+            msg.append(f'分类「{name}」已创建')
+        else:
+            msg.append(f'分类「{name}」已存在')
+
+    msg.append('<br>账号：admin / admin123')
+    msg.append('<br><a href="/admin/">去后台</a> | <a href="/">去首页</a>')
+    return HttpResponse('<br>'.join(msg))
 
 
