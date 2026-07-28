@@ -4,6 +4,7 @@ Django settings for myblog project.
 
 import os
 from pathlib import Path
+import dj_database_url
 
 # ── 项目根目录 ──────────────────
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -65,13 +66,13 @@ TEMPLATES = [
 WSGI_APPLICATION = 'myblog.wsgi.application'
 
 # ── 数据库 ──────────────────
-# 学习阶段用 SQLite（零配置，一个文件就是数据库）
-# 切换到 MySQL 只需要改 ENGINE / NAME / HOST / USER / PASSWORD
+# 本地开发：SQLite；Railway 生产：自动检测 DATABASE_URL
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=f'sqlite:///{BASE_DIR / "db.sqlite3"}',
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
 }
 
 # ── 密码验证 ──────────────────
