@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>写文章</title>
+</head>
+<body>
+    <h1>{% if form.instance.pk %}编辑文章{% else %}写文章{% endif %}</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">保存</button>
+    </form>
+    <p><a href="{% url 'post_list' %}">← 返回首页</a></p>
+</body>
+</html>

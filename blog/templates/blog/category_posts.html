@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>分类：{{ category.name }}</title>
+</head>
+<body>
+    <h1>分类：{{ category.name }}</h1>
+    <p><a href="{% url 'post_list' %}">← 返回首页</a></p>
+    <hr>
+
+    {% for post in posts %}
+        <article>
+            <h2><a href="{% url 'post_detail' post.slug %}">{{ post.title }}</a></h2>
+            <p>作者：{{ post.author.username }} | {{ post.created_at|date:"Y-m-d" }}</p>
+            <p>{{ post.content|truncatechars:150 }}</p>
+        </article>
+        <hr>
+    {% empty %}
+        <p>这个分类下还没有文章。</p>
+    {% endfor %}
+</body>
+</html>

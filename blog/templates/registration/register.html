@@ -1,0 +1,17 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>注册</title>
+</head>
+<body>
+    <h1>注册</h1>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">注册</button>
+    </form>
+    <p>已有账号？<a href="{% url 'login' %}">去登录</a></p>
+</body>
+</html>

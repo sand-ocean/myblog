@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ post.title }}</title>
+</head>
+<body>
+    <h1>{{ post.title }}</h1>
+    <p>
+        作者：{{ post.author.username }} |
+        分类：<a href="{% url 'category_posts' post.category.slug %}">{{ post.category.name }}</a> |
+        {{ post.created_at|date:"Y-m-d H:i" }}
+    </p>
+    <hr>
+    <div>{{ post.content|linebreaks }}</div>
+    <hr>
+
+    {% if user == post.author %}
+        <p>
+            <a href="{% url 'post_edit' post.slug %}">编辑</a> |
+            <form method="post" action="{% url 'post_delete' post.slug %}" style="display:inline">
+                {% csrf_token %}
+                <button type="submit" onclick="return confirm('确定删除？')">删除</button>
+            </form>
+        </p>
+    {% endif %}
+
+    <!-- 评论列表 -->
+    <h2>评论 ({{ comments.count }})</h2>
+    {% for comment in comments %}
+        <p>
+            <strong>{{ comment.author.username }}</strong>
+            <small>{{ comment.created_at|date:"Y-m-d H:i" }}</small><br>
+            {{ comment.content }}
+        </p>
+        <hr>
+    {% empty %}
+        <p>暂无评论。</p>
+    {% endfor %}
+
+    <!-- 评论表单 -->
+    {% if user.is_authenticated %}
+        <h3>发表评论</h3>
+        <form method="post" action="{% url 'post_comments' post.slug %}">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">提交评论</button>
+        </form>
+    {% else %}
+        <p><a href="{% url 'login' %}">登录</a>后可以评论</p>
+    {% endif %}
+
+    <p><a href="{% url 'post_list' %}">← 返回首页</a></p>
+</body>
+</html>
