@@ -14,6 +14,10 @@ DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 ALLOWED_HOSTS = ['*']  # Railway 分配域名
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-swaeig^!j=utfov2s^k2qe(a*1pxr+3txn3q^p9b&3qso$6an#')
 
+# Railway 跑在 HTTPS 代理后面，Django 需要知道
+CSRF_TRUSTED_ORIGINS = ['https://*.railway.app', 'https://*.up.railway.app']
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # ── 模块注册 ──────────────────
 # Django 项目 = 多个 App 拼起来，每创建一个 App 就加到下面
 INSTALLED_APPS = [
