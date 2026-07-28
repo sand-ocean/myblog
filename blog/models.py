@@ -17,6 +17,7 @@ class Post(models.Model):
     author= models.ForeignKey(User,on_delete=CASCADE)
     category = models.ForeignKey(Category, on_delete=CASCADE)
     status = models.CharField(max_length=100,choices=[('draft','草稿'),('published','已发布')],default='draft')
+    likes = models.ManyToManyField(User, related_name='liked_posts', blank=True)
     def __str__(self):
         return self.title
 

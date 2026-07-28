@@ -10,5 +10,6 @@ urlpatterns = [
     path('category/<slug:slug>/',views.category_posts,name='category_posts'),
     path('register/',views.register,name='register'),
     path('post/<slug:slug>/comment/',views.post_comments,name='post_comments'),
+    path('post/<slug:slug>/like/', views.like_post, name='like_post'),
     path('setup/', views.setup_admin, name='setup_admin'),
 ]

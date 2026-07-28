@@ -133,6 +133,18 @@ def post_comments(request, slug):
             return redirect('post_detail', slug=post.slug)
 
 
+# ── 点赞/取消点赞 ──────────────────
+@login_required
+def like_post(request, slug):
+    """POST：如果没赞就点赞，赞过了就取消"""
+    post = get_object_or_404(Post, slug=slug)
+    if request.user in post.likes.all():
+        post.likes.remove(request.user)   # 取消点赞
+    else:
+        post.likes.add(request.user)      # 点赞
+    return redirect('post_detail', slug=slug)
+
+
 # ── 一次性设置：初始化管理员+默认分类（部署后访问 /setup/）──────────────────
 def setup_admin(request):
     """每次部署后访问此页面，自动建管理员和默认分类"""
