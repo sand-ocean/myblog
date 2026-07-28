@@ -1,16 +1,23 @@
-<!DOCTYPE html>
-<html lang="zh">
-<head>
-    <meta charset="UTF-8">
-    <title>写文章</title>
-</head>
-<body>
-    <h1>{% if form.instance.pk %}编辑文章{% else %}写文章{% endif %}</h1>
+{% extends 'base.html' %}
+{% block title %}{% if form.instance.pk %}编辑文章{% else %}写文章{% endif %}{% endblock %}
+{% block content %}
+
+<div class="bg-white border border-gray-200 rounded-lg p-8 max-w-2xl mx-auto">
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">
+        {% if form.instance.pk %}编辑文章{% else %}写文章{% endif %}
+    </h1>
     <form method="post">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">保存</button>
+        <div class="space-y-4">
+            {{ form.as_p }}
+        </div>
+        <div class="flex gap-3 mt-6 pt-6 border-t border-gray-100">
+            <button type="submit"
+                    class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">保存</button>
+            <a href="{% url 'post_list' %}"
+               class="px-6 py-2 border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-50 transition">取消</a>
+        </div>
     </form>
-    <p><a href="{% url 'post_list' %}">← 返回首页</a></p>
-</body>
-</html>
+</div>
+
+{% endblock %}

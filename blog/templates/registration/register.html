@@ -1,17 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}注册{% endblock %}
+{% block content %}
 
-<!DOCTYPE html>
-<html lang="zh">
-<head>
-    <meta charset="UTF-8">
-    <title>注册</title>
-</head>
-<body>
-    <h1>注册</h1>
-    <form method="POST">
+<div class="max-w-sm mx-auto bg-white border border-gray-200 rounded-lg p-8 mt-12">
+    <h1 class="text-2xl font-bold text-gray-900 mb-6 text-center">注册</h1>
+    <form method="post">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">注册</button>
+        <div class="space-y-4">
+            {{ form.as_p }}
+        </div>
+        <button type="submit"
+                class="w-full mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">注册</button>
     </form>
-    <p>已有账号？<a href="{% url 'login' %}">去登录</a></p>
-</body>
-</html>
+    <p class="text-center text-sm text-gray-500 mt-4">
+        已有账号？<a href="{% url 'login' %}" class="text-blue-600 hover:text-blue-800">去登录</a>
+    </p>
+</div>
+
+{% endblock %}

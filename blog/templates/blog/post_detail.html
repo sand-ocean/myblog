@@ -1,55 +1,62 @@
-<!DOCTYPE html>
-<html lang="zh">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ post.title }}</title>
-</head>
-<body>
-    <h1>{{ post.title }}</h1>
-    <p>
-        作者：{{ post.author.username }} |
-        分类：<a href="{% url 'category_posts' post.category.slug %}">{{ post.category.name }}</a> |
-        {{ post.created_at|date:"Y-m-d H:i" }}
-    </p>
-    <hr>
-    <div>{{ post.content|linebreaks }}</div>
-    <hr>
+{% extends 'base.html' %}
+{% block title %}{{ post.title }}{% endblock %}
+{% block content %}
+
+<article class="bg-white border border-gray-200 rounded-lg p-8 mb-6">
+    <h1 class="text-3xl font-bold text-gray-900 mb-4">{{ post.title }}</h1>
+    <div class="flex flex-wrap gap-4 text-sm text-gray-500 mb-6 pb-6 border-b border-gray-100">
+        <span>👤 {{ post.author.username }}</span>
+        <span>📂 <a href="{% url 'category_posts' post.category.slug %}" class="text-blue-500 hover:text-blue-700">{{ post.category.name }}</a></span>
+        <span>📅 {{ post.created_at|date:"Y-m-d H:i" }}</span>
+        {% if post.status == 'draft' %}
+            <span class="bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded text-xs">草稿</span>
+        {% endif %}
+    </div>
+    <div class="prose max-w-none text-gray-800 leading-relaxed text-lg">
+        {{ post.content|linebreaks }}
+    </div>
 
     {% if user == post.author %}
-        <p>
-            <a href="{% url 'post_edit' post.slug %}">编辑</a> |
-            <form method="post" action="{% url 'post_delete' post.slug %}" style="display:inline">
-                {% csrf_token %}
-                <button type="submit" onclick="return confirm('确定删除？')">删除</button>
-            </form>
-        </p>
+    <div class="flex gap-3 mt-8 pt-6 border-t border-gray-100">
+        <a href="{% url 'post_edit' post.slug %}"
+           class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm">编辑</a>
+        <form method="post" action="{% url 'post_delete' post.slug %}">
+            {% csrf_token %}
+            <button type="submit" onclick="return confirm('确定删除？')"
+                    class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition text-sm">删除</button>
+        </form>
+    </div>
     {% endif %}
+</article>
 
-    <!-- 评论列表 -->
-    <h2>评论 ({{ comments.count }})</h2>
+<!-- 评论 -->
+<section class="bg-white border border-gray-200 rounded-lg p-8">
+    <h2 class="text-xl font-bold text-gray-900 mb-6">评论 ({{ comments.count }})</h2>
+
     {% for comment in comments %}
-        <p>
-            <strong>{{ comment.author.username }}</strong>
-            <small>{{ comment.created_at|date:"Y-m-d H:i" }}</small><br>
-            {{ comment.content }}
-        </p>
-        <hr>
+        <div class="border-b border-gray-100 py-4 last:border-0">
+            <p class="text-sm text-gray-500 mb-1">
+                <strong class="text-gray-700">{{ comment.author.username }}</strong>
+                · {{ comment.created_at|date:"Y-m-d H:i" }}
+            </p>
+            <p class="text-gray-700">{{ comment.content }}</p>
+        </div>
     {% empty %}
-        <p>暂无评论。</p>
+        <p class="text-gray-400 text-center py-4">暂无评论</p>
     {% endfor %}
 
-    <!-- 评论表单 -->
     {% if user.is_authenticated %}
-        <h3>发表评论</h3>
-        <form method="post" action="{% url 'post_comments' post.slug %}">
+        <form method="post" action="{% url 'post_comments' post.slug %}" class="mt-6 pt-6 border-t border-gray-100">
             {% csrf_token %}
             {{ form.as_p }}
-            <button type="submit">提交评论</button>
+            <button type="submit"
+                    class="mt-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">提交评论</button>
         </form>
     {% else %}
-        <p><a href="{% url 'login' %}">登录</a>后可以评论</p>
+        <p class="mt-6 pt-6 border-t border-gray-100 text-center text-gray-400">
+            <a href="{% url 'login' %}" class="text-blue-500 hover:text-blue-700">登录</a>后可以评论
+        </p>
     {% endif %}
+</section>
 
-    <p><a href="{% url 'post_list' %}">← 返回首页</a></p>
-</body>
-</html>
+{% endblock %}
