@@ -1,19 +1,228 @@
 {% extends 'base.html' %}
-{% block title %}{% if form.instance.pk %}编辑文章{% else %}写文章{% endif %}{% endblock %}
+{% block title %}{% if form.instance.pk %}编辑：{{ form.instance.title }}{% else %}写文章{% endif %} - 我的博客{% endblock %}
 {% block content %}
 
-<div class="bg-violet-950/50 border border-violet-900/50 rounded-lg p-8 max-w-2xl mx-auto">
-    <h1 class="text-2xl font-bold text-violet-100 mb-6">{% if form.instance.pk %}编辑文章{% else %}写文章{% endif %}</h1>
-    <form method="post" class="space-y-4">
-        {% csrf_token %}
-        <div class="space-y-4 [&_label]:text-violet-400 [&_label]:block [&_label]:mb-1 [&_input]:w-full [&_input]:px-3 [&_input]:py-2 [&_input]:bg-violet-950 [&_input]:border [&_input]:border-violet-800 [&_input]:rounded-lg [&_input]:text-violet-200 [&_input]:focus:outline-none [&_input]:focus:ring-2 [&_input]:focus:ring-pink-500 [&_select]:w-full [&_select]:px-3 [&_select]:py-2 [&_select]:bg-violet-950 [&_select]:border [&_select]:border-violet-800 [&_select]:rounded-lg [&_select]:text-violet-200 [&_select]:focus:outline-none [&_select]:focus:ring-2 [&_select]:focus:ring-pink-500 [&_textarea]:w-full [&_textarea]:px-3 [&_textarea]:py-2 [&_textarea]:bg-violet-950 [&_textarea]:border [&_textarea]:border-violet-800 [&_textarea]:rounded-lg [&_textarea]:text-violet-200 [&_textarea]:focus:outline-none [&_textarea]:focus:ring-2 [&_textarea]:focus:ring-pink-500">
-            {{ form.as_p }}
-        </div>
-        <div class="flex gap-3 pt-6 border-t border-violet-900/50">
-            <button type="submit" class="px-6 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-500 transition">保存</button>
-            <a href="{% url 'post_list' %}" class="px-6 py-2 border border-violet-800 text-violet-400 rounded-lg hover:bg-violet-900 hover:text-violet-200 transition">取消</a>
-        </div>
-    </form>
-</div>
+{% with is_edit=form.instance.pk %}
+<div class="max-w-4xl mx-auto">
 
+  <!-- 顶部栏 -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+    <div>
+      <h1 class="text-2xl font-bold text-violet-100">
+        {% if is_edit %}✏️ 编辑文章{% else %}✍️ 写文章{% endif %}
+      </h1>
+      <p class="text-violet-500 text-sm mt-1">
+        {% if is_edit %}
+          最后更新：{{ form.instance.updated_at|date:"Y-m-d H:i" }}
+        {% else %}
+          记录你的想法，分享给世界
+        {% endif %}
+      </p>
+    </div>
+    <!-- 桌面端操作按钮 -->
+    <div class="hidden sm:flex items-center gap-3">
+      <a href="{% url 'post_list' %}"
+         class="px-4 py-2 border border-violet-800 text-violet-400 rounded-xl hover:bg-violet-900/50 hover:text-violet-200 transition text-sm font-medium">
+        取消
+      </a>
+      <button type="submit" form="post-form"
+              class="px-5 py-2 bg-pink-600 hover:bg-pink-500 active:bg-pink-700 text-white rounded-xl font-medium transition text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 focus:ring-offset-indigo-950">
+        {% if is_edit %}保存修改{% else %}发布文章{% endif %}
+      </button>
+    </div>
+  </div>
+
+  {% if form.errors %}
+  <div class="mb-6 p-4 bg-red-950/30 border border-red-900/50 rounded-xl text-sm" role="alert">
+    <p class="font-medium text-red-300 mb-2">⚠️ 请修正以下错误：</p>
+    <ul class="list-disc list-inside space-y-0.5 text-red-400">
+      {% for field, errors in form.errors.items %}
+        {% for error in errors %}
+          <li><strong>{{ field }}:</strong> {{ error }}</li>
+        {% endfor %}
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  <form method="post" id="post-form" class="space-y-6" novalidate>
+    {% csrf_token %}
+
+    <!-- 标题 -->
+    <div>
+      <label for="id_title" class="block text-sm font-medium text-violet-300 mb-1.5">
+        标题 <span class="text-red-400">*</span>
+      </label>
+      <input
+        type="text"
+        name="title"
+        id="id_title"
+        value="{{ form.title.value|default:'' }}"
+        required
+        autofocus
+        maxlength="200"
+        placeholder="给你的文章起个吸引人的标题…"
+        class="w-full px-4 py-3 bg-indigo-950/60 border {% if form.title.errors %}border-red-700{% else %}border-violet-800{% endif %} rounded-xl text-violet-100 text-lg placeholder-violet-600 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
+      >
+      <div class="flex items-center justify-between mt-1.5">
+        {% if form.title.errors %}
+          <p class="text-xs text-red-400">{{ form.title.errors.0 }}</p>
+        {% else %}
+          <span></span>
+        {% endif %}
+        <span class="text-xs text-violet-600" id="title-count">0 / 200</span>
+      </div>
+    </div>
+
+    <!-- URL 别名 -->
+    <div>
+      <label for="id_slug" class="block text-sm font-medium text-violet-300 mb-1.5">
+        URL 别名 <span class="text-red-400">*</span>
+      </label>
+      <div class="relative">
+        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-violet-600 text-sm select-none">/post/</span>
+        <input
+          type="text"
+          name="slug"
+          id="id_slug"
+          value="{{ form.slug.value|default:'' }}"
+          required
+          maxlength="200"
+          placeholder="my-awesome-post"
+          class="w-full pl-16 pr-4 py-3 bg-indigo-950/60 border {% if form.slug.errors %}border-red-700{% else %}border-violet-800{% endif %} rounded-xl text-violet-100 placeholder-violet-600 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
+        >
+      </div>
+      {% if form.slug.errors %}
+        <p class="mt-1 text-xs text-red-400">{{ form.slug.errors.0 }}</p>
+      {% else %}
+        <p class="mt-1 text-xs text-violet-600">英文、数字和连字符组成，如 my-first-post</p>
+      {% endif %}
+    </div>
+
+    <!-- 正文 -->
+    <div>
+      <label for="id_content" class="block text-sm font-medium text-violet-300 mb-1.5">
+        正文 <span class="text-red-400">*</span>
+      </label>
+      <textarea
+        name="content"
+        id="id_content"
+        required
+        rows="16"
+        placeholder="开始书写你的故事…&#10;&#10;支持纯文本和 Markdown 格式。"
+        class="w-full px-4 py-4 bg-indigo-950/60 border {% if form.content.errors %}border-red-700{% else %}border-violet-800{% endif %} rounded-xl text-violet-100 placeholder-violet-600 leading-relaxed resize-y focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition font-mono text-sm"
+      >{{ form.content.value|default:'' }}</textarea>
+      <div class="flex items-center justify-between mt-1.5">
+        {% if form.content.errors %}
+          <p class="text-xs text-red-400">{{ form.content.errors.0 }}</p>
+        {% else %}
+          <span></span>
+        {% endif %}
+        <span class="text-xs text-violet-600" id="char-count">0 字</span>
+      </div>
+    </div>
+
+    <!-- 分类 & 状态（并排） -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <!-- 分类 -->
+      <div>
+        <label for="id_category" class="block text-sm font-medium text-violet-300 mb-1.5">分类</label>
+        <select
+          name="category"
+          id="id_category"
+          class="w-full px-4 py-3 bg-indigo-950/60 border border-violet-800 rounded-xl text-violet-100 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition cursor-pointer"
+        >
+          {% for choice in form.category.field.queryset %}
+            <option value="{{ choice.id }}"
+              {% if form.category.value|stringformat:"s" == choice.id|stringformat:"s" %}selected{% endif %}>
+              {{ choice.name }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- 状态 -->
+      <div>
+        <label class="block text-sm font-medium text-violet-300 mb-1.5">状态</label>
+        <div class="flex gap-2">
+          {% for value, label in form.status.field.choices %}
+          <label class="flex-1 cursor-pointer">
+            <input
+              type="radio"
+              name="status"
+              value="{{ value }}"
+              class="peer sr-only"
+              {% if form.status.value == value or not form.status.value and value == 'draft' %}checked{% endif %}
+            >
+            <div class="px-4 py-3 text-center rounded-xl border-2 transition text-sm font-medium
+              {% if value == 'draft' %}
+                border-yellow-800 peer-checked:border-yellow-500 peer-checked:bg-yellow-950/30 text-yellow-400
+              {% else %}
+                border-green-800 peer-checked:border-green-500 peer-checked:bg-green-950/30 text-green-400
+              {% endif %}
+              hover:border-opacity-80
+            ">
+              {% if value == 'draft' %}📄 草稿{% else %}🚀 发布{% endif %}
+            </div>
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- 移动端操作按钮（固定在底部） -->
+    <div class="sm:hidden flex gap-3 pt-4 border-t border-violet-900/50">
+      <a href="{% url 'post_list' %}"
+         class="flex-1 px-4 py-3 border border-violet-800 text-violet-400 rounded-xl hover:bg-violet-900/50 text-center text-sm font-medium transition">
+        取消
+      </a>
+      <button type="submit"
+              class="flex-[2] px-5 py-3 bg-pink-600 hover:bg-pink-500 active:bg-pink-700 text-white rounded-xl font-medium text-sm transition focus:outline-none focus:ring-2 focus:ring-pink-500">
+        {% if is_edit %}保存修改{% else %}发布文章{% endif %}
+      </button>
+    </div>
+
+  </form>
+</div>
+{% endwith %}
+
+<script>
+  // 标题字数
+  (function() {
+    const title = document.getElementById('id_title');
+    const count = document.getElementById('title-count');
+    function update() {
+      const len = title.value.length;
+      count.textContent = len + ' / 200';
+      count.className = 'text-xs ' + (len > 180 ? 'text-yellow-400' : len >= 200 ? 'text-red-400' : 'text-violet-600');
+    }
+    title.addEventListener('input', update);
+    update();
+
+    // 标题自动填充 slug
+    const slug = document.getElementById('id_slug');
+    let slugTouched = slug.value.length > 0;
+    slug.addEventListener('input', function() { slugTouched = true; });
+    title.addEventListener('input', function() {
+      if (!slugTouched && '{{ is_edit }}' !== 'True') {
+        slug.value = title.value
+          .toLowerCase()
+          .replace(/[^\w\s-]/g, '')
+          .replace(/[\s_]+/g, '-')
+          .replace(/^-+|-+$/g, '')
+          .substring(0, 200);
+      }
+    });
+
+    // 正文字数
+    const content = document.getElementById('id_content');
+    const charCount = document.getElementById('char-count');
+    function updateChar() {
+      const len = content.value.length;
+      charCount.textContent = len.toLocaleString() + ' 字';
+    }
+    content.addEventListener('input', updateChar);
+    updateChar();
+  })();
+</script>
 {% endblock %}
