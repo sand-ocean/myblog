@@ -1,9 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 from .models import Post, Category
 from .forms import PostForm, CommentForm
 from django.db.models import Q
@@ -40,7 +38,7 @@ def post_list(request):
     paginator = Paginator(posts, 5)  # 每页5篇
     page_number = request.GET.get('page', 1)  # 当前第几页，默认1
     page_obj = paginator.get_page(page_number)
-    return render(request, 'blog/post_list.html', {'posts': posts,'page_obj':page_obj})
+    return render(request, 'blog/post_list.html', {'page_obj': page_obj})
 
 
 
@@ -113,9 +111,12 @@ def post_delete(request, slug):
 
 # ── 按分类筛选 ──────────────────
 def category_posts(request, slug):
-    """展示某个分类下的所有文章"""
+    """展示某个分类下的所有文章（未登录只看已发布）"""
     category = get_object_or_404(Category, slug=slug)
-    posts = Post.objects.filter(category=category).order_by('-created_at')
+    posts = Post.objects.filter(category=category)
+    if not request.user.is_authenticated:
+        posts = posts.filter(status='published')
+    posts = posts.order_by('-created_at')
     return render(request, 'blog/category_posts.html', {
         'category': category,
         'posts': posts,
@@ -127,10 +128,11 @@ def post_comments(request, slug):
         form = CommentForm(request.POST)
         if form.is_valid():
             comment = form.save(commit=False)
-            comment.post=post
+            comment.post = post
             comment.author = request.user
             comment.save()
             return redirect('post_detail', slug=post.slug)
+    return redirect('post_detail', slug=post.slug)
 
 
 # ── 点赞/取消点赞 ──────────────────
@@ -145,33 +147,7 @@ def like_post(request, slug):
     return redirect('post_detail', slug=slug)
 
 
-# ── 一次性设置：初始化管理员+默认分类（部署后访问 /setup/）──────────────────
-def setup_admin(request):
-    """每次部署后访问此页面，自动建管理员和默认分类"""
-    msg = []
-
-    # 建管理员
-    if User.objects.filter(username='admin').exists():
-        msg.append('管理员已存在')
-    else:
-        User.objects.create_superuser('admin', 'admin@example.com', 'admin123')
-        msg.append('管理员创建成功')
-
-    # 建默认分类
-    defaults = [
-        ('python', 'Python'),
-        ('django', 'Django'),
-        ('life', '生活随笔'),
-    ]
-    for slug, name in defaults:
-        obj, created = Category.objects.get_or_create(slug=slug, defaults={'name': name})
-        if created:
-            msg.append(f'分类「{name}」已创建')
-        else:
-            msg.append(f'分类「{name}」已存在')
-
-    msg.append('<br>账号：admin / admin123')
-    msg.append('<br><a href="/admin/">去后台</a> | <a href="/">去首页</a>')
-    return HttpResponse('<br>'.join(msg))
+# ── setup_admin 已迁移到管理命令 ──
+# 部署后运行：python manage.py setup_admin
 
 
