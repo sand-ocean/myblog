@@ -4,3 +4,8 @@ __pycache__/
 db.sqlite3
 staticfiles/
 .env
+
+# 防止技能目录被误提交为子模块
+.claude/skills/
+~/.claude/skills/
+
