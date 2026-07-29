@@ -67,7 +67,7 @@ def post_new(request):
             post = form.save(commit=False)    # 暂不写入
             post.author = request.user         # 补上作者
             post.save()                        # 现在写入
-            return redirect('post_detail', slug=post.slug)
+            return redirect('post_list')
     else:
         form = PostForm()
     return render(request, 'blog/post_form.html', {'form': form})
@@ -86,7 +86,7 @@ def post_edit(request, slug):
         form = PostForm(request.POST, instance=post)
         if form.is_valid():
             form.save()
-            return redirect('post_detail', slug=post.slug)
+            return redirect('post_list')
     else:
         form = PostForm(instance=post)         # GET → 填充已有数据
 
