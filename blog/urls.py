@@ -4,12 +4,13 @@ from . import views
 
 urlpatterns = [
     path('', views.post_list, name='post_list'),
-    path('post/<slug:slug>/', views.post_detail, name='post_detail'),
+    # 固定路径必须在 <slug> 之前，否则 'new' 会被当成 slug
     path('post/new/', views.post_new, name='post_new'),
+    path('register/', views.register, name='register'),
+    path('post/<slug:slug>/', views.post_detail, name='post_detail'),
     path('post/<slug:slug>/edit/', views.post_edit, name='post_edit'),
     path('post/<slug:slug>/delete/', views.post_delete, name='post_delete'),
-    path('category/<slug:slug>/', views.category_posts, name='category_posts'),
-    path('register/', views.register, name='register'),
     path('post/<slug:slug>/comment/', views.post_comments, name='post_comments'),
     path('post/<slug:slug>/like/', views.like_post, name='like_post'),
+    path('category/<slug:slug>/', views.category_posts, name='category_posts'),
 ]

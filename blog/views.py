@@ -132,6 +132,13 @@ def post_comments(request, slug):
             comment.author = request.user
             comment.save()
             return redirect('post_detail', slug=post.slug)
+        # 验证失败 → 回到文章页，带上错误表单
+        comments = post.comments.all().order_by('-created_at')
+        return render(request, 'blog/post_detail.html', {
+            'post': post,
+            'comments': comments,
+            'form': form,
+        })
     return redirect('post_detail', slug=post.slug)
 
 
