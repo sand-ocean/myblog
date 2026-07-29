@@ -1,85 +1,62 @@
 <!DOCTYPE html>
-<html lang="zh" class="dark">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}mineblog{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        red: {  DEFAULT: '#ec4141',  light: '#f05a5a',  dark: '#d73535',  softer: '#e03a3a' },
-                        card: { DEFAULT: '#252525', hover: '#2e2e2e', light: '#2a2a2a' },
-                        bg:   { DEFAULT: '#121212', raised: '#1a1a1a', overlay: '#1e1e1e' },
-                        border: { DEFAULT: '#2a2a2a', light: '#333333', subtle: '#222222' },
-                        text:  { primary: '#e0e0e0', secondary: '#999999', muted: '#777777' },
-                    },
-                },
-            },
-        }
-    </script>
+    <script>tailwind.config={darkMode:'class',theme:{extend:{colors:{red:{DEFAULT:'#ec4141',hover:'#f05a5a'},card:{DEFAULT:'#1a1a1a',raised:'#252525'},bg:{DEFAULT:'#121212',raised:'#1a1a1a'},border:{DEFAULT:'#2a2a2a',light:'#333'},text:{primary:'#e0e0e0',secondary:'#999',muted:'#666'}}}}}</script>
     <style>
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #555; }
-        ::selection { background: rgba(236, 65, 65, 0.3); color: #fff; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; }
-        .card { transition: all 0.2s ease; }
-        .card:hover { background-color: #2e2e2e; border-color: #3a3a3a; }
-        .link-red { transition: color 0.15s ease; }
-        .link-red:hover { color: #f05a5a; }
+        :root {
+            --bg: #121212; --surface: #1A1A1A; --surface-raised: #252525;
+            --border: #2A2A2A; --border-visible: #333;
+            --text-primary: #E0E0E0; --text-secondary: #999; --text-muted: #666;
+            --accent: #EC4141; --accent-hover: #F05A5A;
+        }
+        body { font-family: -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif; background: var(--bg); color: var(--text-primary); }
+        ::selection { background: rgba(236,65,65,0.3); color: #fff; }
+        .glass { background: rgba(26,26,26,0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }
+        .card:hover { background: var(--surface-raised); border-color: var(--border-visible); }
+        a { color: var(--text-secondary); transition: color .15s; }
+        a:hover { color: var(--text-primary); }
+        .link-red { color: var(--accent); }
+        .link-red:hover { color: var(--accent-hover); }
+        h1 { font-size: 28px; font-weight: 600; }
+        h2 { font-size: 20px; font-weight: 500; }
+        body { font-size: 16px; line-height: 1.75; }
+        .meta { font-size: 12px; color: var(--text-muted); }
     </style>
 </head>
-<body class="bg-[#121212] text-[#e0e0e0] min-h-screen antialiased">
-
-    <!-- 顶部导航 -->
-    <header class="sticky top-0 z-50 bg-[#1a1a1a]/95 backdrop-blur-xl border-b border-[#2a2a2a]">
-        <div class="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
-            <!-- Logo -->
-            <a href="{% url 'post_list' %}" class="flex items-center gap-2.5 group">
-                <span class="w-8 h-8 bg-red rounded-lg flex items-center justify-center group-hover:bg-[#f05a5a] transition">
-                    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="5" r="2"/><circle cx="12" cy="19" r="2"/><circle cx="5" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
-                </span>
-                <span class="text-lg font-bold text-white tracking-wide">mineblog</span>
-            </a>
-
-            <!-- 导航链接 -->
-            <nav class="flex items-center gap-1 text-sm">
+<body class="min-h-screen antialiased">
+    <!-- 毛玻璃导航 -->
+    <header class="glass sticky top-0 z-50 border-b border-[#2a2a2a]">
+        <div class="max-w-4xl mx-auto px-6 h-14 flex items-center justify-between">
+            <a href="{% url 'post_list' %}" class="font-semibold tracking-wide" style="color:var(--accent);font-size:18px">🎵 mineblog</a>
+            <nav class="flex items-center gap-3 text-sm">
                 {% if user.is_authenticated %}
-                    <a href="{% url 'post_new' %}"
-                       class="flex items-center gap-1.5 px-4 py-2 bg-red/10 border border-red/25 text-red rounded-lg hover:bg-red/20 transition text-xs font-medium">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
-                        写文章
-                    </a>
-                    <span class="w-px h-5 bg-[#333] mx-2"></span>
-                    <span class="text-[#999] text-xs">{{ user.username }}</span>
-                    <a href="{% url 'logout' %}" class="px-3 py-1.5 text-[#999] hover:text-white rounded-md hover:bg-[#2a2a2a] transition text-xs">退出</a>
+                    <a href="{% url 'post_new' %}" class="link-red px-3 py-1.5 rounded-md" style="background:rgba(236,65,65,0.08)">写文章</a>
+                    <span class="meta">{{ user.username }}</span>
+                    <a href="{% url 'logout' %}" class="meta hover:text-white">退出</a>
                 {% else %}
-                    <a href="{% url 'login' %}" class="px-4 py-1.5 text-[#ccc] hover:text-white transition text-xs">登录</a>
-                    <a href="{% url 'register' %}" class="px-4 py-1.5 bg-red text-white rounded-full hover:bg-[#f05a5a] transition text-xs font-medium ml-1">注册</a>
+                    <a href="{% url 'login' %}" class="link-red">登录</a>
+                    <a href="{% url 'register' %}" class="meta hover:text-white">注册</a>
                 {% endif %}
             </nav>
         </div>
     </header>
 
-    <!-- 主内容 -->
-    <main class="max-w-6xl mx-auto px-6 py-8">
+    <main class="max-w-4xl mx-auto px-6 py-12">
         {% block content %}{% endblock %}
     </main>
 
-    <!-- 底部播放栏风格页脚 -->
-    <footer class="fixed bottom-0 left-0 right-0 bg-[#1a1a1a] border-t border-[#2a2a2a] z-40">
-        <div class="max-w-6xl mx-auto px-6 h-12 flex items-center justify-between text-xs text-[#777]">
+    <!-- 播放栏式页脚 -->
+    <footer class="fixed bottom-0 left-0 right-0 border-t border-[#2a2a2a] z-40" style="background:var(--surface)">
+        <div class="max-w-4xl mx-auto px-6 h-12 flex items-center justify-between meta">
             <span>© mineblog</span>
-            <span>Django · Tailwind</span>
+            <span>Django · NetEase Design</span>
         </div>
     </footer>
-
-    <!-- 底部占位 -->
     <div class="h-12"></div>
 </body>
 </html>

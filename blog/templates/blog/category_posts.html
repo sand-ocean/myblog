@@ -2,33 +2,24 @@
 {% block title %}{{ category.name }} - mineblog{% endblock %}
 {% block content %}
 
-<a href="{% url 'post_list' %}" class="inline-flex items-center gap-1.5 text-sm text-[#999] hover:text-red transition mb-6">
-  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-  返回
-</a>
-
-<h1 class="text-xl font-bold text-white mb-1">{{ category.name }}</h1>
-<p class="text-[#888] text-sm mb-6">共 {{ posts.count }} 篇文章</p>
+<h1 class="mb-1">📂 {{ category.name }}</h1>
+<p class="meta mb-8">共 {{ posts.count }} 篇文章</p>
 
 <div class="space-y-3">
 {% for post in posts %}
-  <article class="card group bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-5">
-    <div class="flex items-center gap-2 text-xs text-[#777] mb-2.5">
-      <span class="w-5 h-5 rounded-full bg-red/20 flex items-center justify-center text-red text-[10px] font-bold">
-        {{ post.author.username|slice:":1" }}
-      </span>
-      <span class="text-[#999]">{{ post.author.username }}</span>
-      <span class="text-[#444]">·</span>
-      <time>{{ post.created_at|date:"m-d" }}</time>
-      {% if post.status == 'draft' %}<span class="px-2 py-0.5 bg-yellow-900/30 border border-yellow-700/30 rounded-full text-yellow-500/70 text-[10px]">草稿</span>{% endif %}
-    </div>
-    <h2 class="text-base font-bold mb-2">
-      <a href="{% url 'post_detail' post.slug %}" class="text-[#e0e0e0] group-hover:text-red transition">{{ post.title }}</a>
-    </h2>
-    <p class="text-[#888] text-sm leading-relaxed line-clamp-2">{{ post.content|truncatechars:180 }}</p>
-  </article>
+    <article class="card p-5 transition-colors duration-150">
+        <h2 class="mb-1.5">
+            <a href="{% url 'post_detail' post.slug %}" class="link-red" style="font-weight:500;font-size:20px">{{ post.title }}</a>
+        </h2>
+        <p class="meta mb-2">{{ post.author.username }} · {{ post.created_at|date:"Y-m-d" }}</p>
+        <p style="color:var(--text-secondary);line-height:1.6">{{ post.content|truncatechars:150 }}</p>
+    </article>
 {% empty %}
-  <div class="text-center py-20"><p class="text-[#777]">暂无文章</p></div>
+    <div class="text-center py-20">
+        <p style="font-size:48px;margin-bottom:16px">📭</p>
+        <p class="meta">这个分类下还没有文章</p>
+    </div>
 {% endfor %}
 </div>
+
 {% endblock %}
