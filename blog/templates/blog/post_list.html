@@ -7,8 +7,8 @@
     <div class="flex gap-2">
         <input type="text" name="q" value="{{ request.GET.q }}"
                placeholder="搜索文章..."
-               class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-        <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+               class="flex-1 px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+        <button type="submit" class="px-6 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-500 transition font-medium">
             搜索
         </button>
     </div>
@@ -16,28 +16,28 @@
 
 <!-- 文章列表 -->
 {% for post in page_obj %}
-    <article class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-4 hover:shadow-md transition">
+    <article class="bg-gray-900 border border-gray-800 rounded-lg p-6 mb-4 hover:border-gray-700 transition">
         <h2 class="text-xl font-bold mb-2">
-            <a href="{% url 'post_detail' post.slug %}" class="text-blue-700 hover:text-blue-900">
+            <a href="{% url 'post_detail' post.slug %}" class="text-cyan-400 hover:text-cyan-300">
                 {{ post.title }}
             </a>
             {% if post.status == 'draft' %}
-                <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded">草稿</span>
+                <span class="text-xs bg-yellow-900 text-yellow-400 px-2 py-1 rounded ml-2">草稿</span>
             {% endif %}
         </h2>
         <p class="text-sm text-gray-500 mb-3">
-            作者：{{ post.author.username }} |
-            分类：<a href="{% url 'category_posts' post.category.slug %}" class="text-blue-500 hover:text-blue-700">{{ post.category.name }}</a> |
+            作者：<span class="text-gray-400">{{ post.author.username }}</span> |
+            分类：<a href="{% url 'category_posts' post.category.slug %}" class="text-cyan-500 hover:text-cyan-400">{{ post.category.name }}</a> |
             {{ post.created_at|date:"Y-m-d" }}
         </p>
-        <p class="text-gray-600 leading-relaxed">{{ post.content|truncatechars:200 }}</p>
+        <p class="text-gray-400 leading-relaxed">{{ post.content|truncatechars:200 }}</p>
     </article>
 {% empty %}
-    <div class="text-center py-12 text-gray-400">
+    <div class="text-center py-12 text-gray-600">
         <p class="text-5xl mb-4">📭</p>
         <p class="text-lg">还没有文章</p>
         {% if user.is_authenticated %}
-            <a href="{% url 'post_new' %}" class="text-blue-600 hover:text-blue-800 mt-2 inline-block">写第一篇</a>
+            <a href="{% url 'post_new' %}" class="text-cyan-400 hover:text-cyan-300 mt-2 inline-block">写第一篇</a>
         {% endif %}
     </div>
 {% endfor %}
@@ -47,18 +47,18 @@
 <div class="flex justify-center gap-2 mt-8">
     {% if page_obj.has_previous %}
         <a href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
-           class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-100">首页</a>
+           class="px-3 py-1 border border-gray-700 text-gray-400 rounded hover:bg-gray-800 hover:text-gray-200 transition">首页</a>
         <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
-           class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-100">上一页</a>
+           class="px-3 py-1 border border-gray-700 text-gray-400 rounded hover:bg-gray-800 hover:text-gray-200 transition">上一页</a>
     {% endif %}
-    <span class="px-3 py-1 text-gray-600">
+    <span class="px-3 py-1 text-gray-500">
         {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
     </span>
     {% if page_obj.has_next %}
         <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
-           class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-100">下一页</a>
+           class="px-3 py-1 border border-gray-700 text-gray-400 rounded hover:bg-gray-800 hover:text-gray-200 transition">下一页</a>
         <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
-           class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-100">末页</a>
+           class="px-3 py-1 border border-gray-700 text-gray-400 rounded hover:bg-gray-800 hover:text-gray-200 transition">末页</a>
     {% endif %}
 </div>
 {% endif %}
