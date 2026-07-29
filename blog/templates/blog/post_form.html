@@ -152,7 +152,7 @@
               name="status"
               value="{{ value }}"
               class="peer sr-only"
-              {% if form.status.value == value or not form.status.value and value == 'draft' %}checked{% endif %}
+              {% if form.status.value == value %}checked{% elif not form.status.value and value == 'draft' %}checked{% endif %}
             >
             <div class="px-4 py-3 text-center rounded-xl border-2 transition text-sm font-medium
               {% if value == 'draft' %}
