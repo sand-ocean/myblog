@@ -11,6 +11,16 @@
             --ground: #F8F6F0; --ink: #2A2A28; --soft: #7C7B76;
             --hairline: #E3E0D8; --accent: #C8161D; --surface: #F2F0EA;
         }
+        [data-theme="dark"] {
+            --ground: #1A1A17; --ink: #E6E4D8; --soft: #9A9890;
+            --hairline: #33332E; --accent: #C8161D; --surface: #22221E;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) {
+                --ground: #1A1A17; --ink: #E6E4D8; --soft: #9A9890;
+                --hairline: #33332E; --accent: #C8161D; --surface: #22221E;
+            }
+        }
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: "Noto Serif SC", "Source Han Serif SC", "Songti SC", Georgia, serif;
@@ -36,6 +46,12 @@
         }
         input:focus, textarea:focus, select:focus { border-bottom-color: var(--ink); }
         input::placeholder, textarea::placeholder { color: #C4C0B6; }
+        [data-theme="dark"] input::placeholder,
+        [data-theme="dark"] textarea::placeholder { color: #5A5852; }
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) input::placeholder,
+            :root:not([data-theme="light"]) textarea::placeholder { color: #5A5852; }
+        }
         button { cursor: pointer; font-family: inherit; }
         .btn {
             display: inline-block; padding: 10px 32px; font-size: 13px;
@@ -45,6 +61,7 @@
         .btn:hover { background: var(--ink); color: var(--ground); border-color: var(--ink); }
         .btn-primary { border-color: var(--ink); background: var(--ink); color: var(--ground); }
         .btn-primary:hover { background: transparent; color: var(--ink); }
+        select option { background: var(--ground); color: var(--ink); }
         .fade { animation: fadeIn .6s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         footer { font-size: 11px; color: var(--soft); letter-spacing: 0.05em; padding: 96px 0 48px; }
@@ -67,6 +84,8 @@
                     <a href="{% url 'login' %}">登录</a>
                     <a href="{% url 'register' %}">注册</a>
                 {% endif %}
+                <span class="text-[var(--soft)]" style="font-size:10px">·</span>
+                <button id="theme-toggle" style="background:none;border:none;color:var(--soft);font-size:11px;letter-spacing:0.05em;cursor:pointer" aria-label="切换明暗主题">明</button>
             </nav>
         </div>
     </header>
@@ -78,6 +97,33 @@
     <footer class="max-w-4xl mx-auto px-6">
         <p>&copy; mineblog</p>
     </footer>
+
+    <script>
+    (function(){
+        const html = document.documentElement;
+        const toggle = document.getElementById('theme-toggle');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+        function getTheme() {
+            const saved = localStorage.getItem('theme');
+            if (saved) return saved;
+            return prefersDark.matches ? 'dark' : 'light';
+        }
+
+        function apply(t) {
+            html.setAttribute('data-theme', t);
+            toggle.textContent = t === 'dark' ? '暗' : '明';
+        }
+
+        apply(getTheme());
+
+        toggle.addEventListener('click', function(){
+            const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('theme', next);
+            apply(next);
+        });
+    })();
+    </script>
 
 </body>
 </html>
