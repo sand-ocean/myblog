@@ -4,8 +4,11 @@
 
 <div class="narrow">
 
-    <!-- 返回链接 — 微小标签 -->
-    <a href="{% url 'post_list' %}" class="label" style="display:block;margin-bottom:48px">← 返回</a>
+    <!-- 返回链接 + 进度 -->
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:48px">
+        <a href="{% url 'post_list' %}" class="label">← 返回</a>
+        <span class="label" id="progress-label"></span>
+    </div>
 
     <!-- 文章头 -->
     <header style="margin-bottom: 48px">
@@ -20,8 +23,11 @@
         <p style="color:var(--soft);font-size:13px">{{ post.author.username }}</p>
     </header>
 
+    <!-- 阅读进度 — 顶部 1px 细线 -->
+    <div class="progress-bar" style="position:fixed;top:0;left:0;height:1px;background:var(--hairline);z-index:100;transition:width .2s;width:0%"></div>
+
     <!-- 正文 — 宽行距，舒适阅读 -->
-    <div style="font-size:16px;line-height:2;letter-spacing:0.015em">
+    <div style="font-size:16px;line-height:2;letter-spacing:0.015em" id="article-body">
         {{ post.content|linebreaks }}
     </div>
 
@@ -75,4 +81,25 @@
         {% endif %}
     </section>
 </div>
+
+<script>
+(function(){
+    var bar = document.querySelector('.progress-bar');
+    var label = document.getElementById('progress-label');
+    var article = document.getElementById('article-body');
+    function update(){
+        var top = article.getBoundingClientRect().top;
+        var h = article.offsetHeight;
+        var vh = window.innerHeight;
+        if (top >= 0) { bar.style.width = '0%'; label.textContent = ''; return; }
+        var read = Math.abs(top) + vh;
+        var total = h + vh;
+        var pct = Math.min(100, Math.round(read / total * 100));
+        bar.style.width = pct + '%';
+        label.textContent = pct >= 2 ? pct + '%' : '';
+    }
+    window.addEventListener('scroll', update, {passive:true});
+    update();
+})();
+</script>
 {% endblock %}
