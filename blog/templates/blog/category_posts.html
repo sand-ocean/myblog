@@ -1,25 +1,57 @@
 {% extends 'base.html' %}
-{% block title %}分类：{{ category.name }}{% endblock %}
+{% block title %}{{ category.name }} - 墨痕{% endblock %}
 {% block content %}
 
-<h1 class="text-2xl font-bold text-slate-100 mb-2">📂 {{ category.name }}</h1>
-<p class="text-slate-500 mb-6">共 {{ posts.count }} 篇文章</p>
+<!-- 分类头部 -->
+<div class="mb-10">
+  <a href="{% url 'post_list' %}"
+     class="inline-flex items-center gap-1.5 text-sm text-stone-500 hover:text-amber-400 transition mb-4">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+    返回首页
+  </a>
+  <h1 class="text-3xl sm:text-4xl font-display font-black text-stone-100 mb-2">
+    {{ category.name }}
+  </h1>
+  <p class="text-stone-500 text-sm">共 {{ posts.count }} 篇文章</p>
+</div>
+
+<div class="ornament mb-8 text-xs tracking-widest">· · ·</div>
 
 {% for post in posts %}
-    <article class="bg-slate-950/50 border border-slate-900/50 rounded-lg p-6 mb-4 hover:border-slate-800 transition">
-        <h2 class="text-xl font-bold mb-2">
-            <a href="{% url 'post_detail' post.slug %}" class="text-amber-400 hover:text-amber-300">{{ post.title }}</a>
-        </h2>
-        <p class="text-sm text-slate-500 mb-3">
-            作者：<span class="text-slate-400">{{ post.author.username }}</span> | {{ post.created_at|date:"Y-m-d" }}
-        </p>
-        <p class="text-slate-300 leading-relaxed">{{ post.content|truncatechars:150 }}</p>
-    </article>
-{% empty %}
-    <div class="text-center py-12 text-slate-700">
-        <p class="text-5xl mb-4">📭</p>
-        <p>这个分类下还没有文章</p>
+  <article class="card-glass group relative bg-white/[0.02] border border-white/[0.05] rounded-2xl p-6 sm:p-7 mb-4 hover:bg-white/[0.04] hover:border-amber-700/20">
+    <div class="flex flex-wrap items-center gap-3 text-xs text-stone-500 mb-3">
+      <span class="inline-flex items-center gap-1">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+        {{ post.author.username }}
+      </span>
+      <span class="opacity-30">·</span>
+      <time>{{ post.created_at|date:"Y-m-d" }}</time>
+      {% if post.status == 'draft' %}
+        <span class="px-2 py-0.5 bg-yellow-950/40 border border-yellow-800/30 rounded-full text-yellow-500/80 text-[11px] font-medium">草稿</span>
+      {% endif %}
     </div>
+    <h2 class="text-xl font-bold font-display mb-3">
+      <a href="{% url 'post_detail' post.slug %}"
+         class="text-stone-200 group-hover:text-amber-400 transition">
+        {{ post.title }}
+      </a>
+    </h2>
+    <p class="text-stone-500 leading-relaxed text-sm line-clamp-2">
+      {{ post.content|truncatechars:180 }}
+    </p>
+    <div class="mt-4">
+      <a href="{% url 'post_detail' post.slug %}"
+         class="inline-flex items-center gap-1.5 text-xs font-medium text-amber-600 hover:text-amber-400 transition">
+        继续阅读
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+      </a>
+    </div>
+  </article>
+{% empty %}
+  <div class="text-center py-24">
+    <p class="text-5xl mb-4 opacity-20">📂</p>
+    <p class="text-stone-600">这个分类下还没有文章</p>
+  </div>
 {% endfor %}
 
 {% endblock %}

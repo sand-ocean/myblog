@@ -1,101 +1,96 @@
 {% extends 'base.html' %}
-{% block title %}登录 - 我的博客{% endblock %}
+{% block title %}登录 · 墨痕{% endblock %}
 {% block content %}
 
-<div class="min-h-[80vh] flex items-center justify-center px-4">
-  <div class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 bg-slate-950/30 border border-slate-900/50 rounded-2xl overflow-hidden shadow-2xl shadow-black/20">
+<div class="min-h-[75vh] flex items-center justify-center px-4">
+  <div class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 bg-white/[0.02] border border-white/[0.05] rounded-3xl overflow-hidden shadow-2xl shadow-black/30">
 
-    <!-- 左侧：品牌区 -->
-    <div class="hidden lg:flex flex-col justify-center p-12 bg-gradient-to-br from-gray-900/60 to-slate-900/40 border-r border-slate-900/30">
+    <!-- 左侧：品牌 -->
+    <div class="hidden lg:flex flex-col justify-between p-12 bg-gradient-to-br from-amber-950/30 via-gray-950 to-gray-950 border-r border-white/[0.04]">
+      <div>
+        <a href="{% url 'post_list' %}" class="inline-flex items-center gap-2 text-stone-400 hover:text-amber-400 transition text-sm mb-12">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+          返回首页
+        </a>
+      </div>
       <div class="space-y-6">
-        <div class="w-12 h-12 bg-amber-600/20 rounded-xl flex items-center justify-center">
-          <span class="text-2xl">📝</span>
+        <div class="w-14 h-14 bg-amber-600/15 rounded-2xl flex items-center justify-center">
+          <svg class="w-7 h-7 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+          </svg>
         </div>
-        <h1 class="text-3xl font-bold text-slate-100 leading-tight">
-          欢迎回来
+        <h1 class="text-3xl font-display font-black text-stone-100 leading-tight">
+          欢迎回到<br><span class="text-amber-500">墨痕</span>
         </h1>
-        <p class="text-slate-400 leading-relaxed">
-          登录后可以写文章、发表评论、和更多读者互动。
-          每一次书写，都是与自己的对话。
+        <p class="text-stone-500 leading-relaxed text-sm">
+          每一次书写，都是在时光里留下痕迹。
+          登录后继续你的创作之旅。
         </p>
-        <div class="flex gap-4 pt-4 text-sm text-slate-500">
+        <div class="flex gap-4 pt-6 text-xs text-stone-600">
           <span class="flex items-center gap-1.5">
-            <span class="w-1.5 h-1.5 bg-amber-500 rounded-full"></span> Markdown 支持
+            <span class="w-1.5 h-1.5 bg-amber-600/60 rounded-full"></span> Markdown 写作
           </span>
           <span class="flex items-center gap-1.5">
-            <span class="w-1.5 h-1.5 bg-amber-500 rounded-full"></span> 草稿自动保存
+            <span class="w-1.5 h-1.5 bg-amber-600/60 rounded-full"></span> 草稿保存
           </span>
         </div>
+      </div>
+      <div class="text-xs text-stone-700 mt-auto pt-8 border-t border-white/[0.03]">
+        墨痕 · 以墨为痕
       </div>
     </div>
 
-    <!-- 右侧：登录表单 -->
-    <div class="p-8 sm:p-12">
-      <!-- 移动端品牌 -->
+    <!-- 右侧：表单 -->
+    <div class="p-8 sm:p-12 flex flex-col justify-center">
       <div class="lg:hidden mb-8 text-center">
-        <span class="text-3xl">📝</span>
-        <h1 class="text-2xl font-bold text-slate-100 mt-2">欢迎回来</h1>
-        <p class="text-slate-500 text-sm mt-1">登录你的博客账号</p>
+        <span class="text-4xl">✒️</span>
+        <h1 class="text-2xl font-display font-bold text-stone-100 mt-3">欢迎回来</h1>
+        <p class="text-stone-500 text-sm mt-1">登录你的博客账号</p>
       </div>
 
-      <h2 class="hidden lg:block text-2xl font-bold text-slate-100 mb-2">登录</h2>
-      <p class="hidden lg:block text-slate-500 text-sm mb-8">还没有账号？<a href="{% url 'register' %}" class="text-amber-400 hover:text-amber-300 font-medium">立即注册</a></p>
+      <h2 class="hidden lg:block text-2xl font-display font-bold text-stone-100 mb-1.5">登录</h2>
+      <p class="hidden lg:block text-stone-500 text-sm mb-8">
+        还没有账号？<a href="{% url 'register' %}" class="text-amber-400 hover:text-amber-300 font-medium underline decoration-amber-700 underline-offset-4">立即注册</a>
+      </p>
 
       {% if form.errors %}
-      <div class="mb-6 p-4 bg-red-950/30 border border-red-900/50 rounded-xl text-sm text-red-300" role="alert">
-        <p class="font-medium mb-1">⚠️ 登录失败</p>
-        <p class="text-red-400">用户名或密码不正确，请重试。</p>
+      <div class="mb-6 p-4 bg-red-950/20 border border-red-900/30 rounded-2xl text-sm" role="alert">
+        <div class="flex items-start gap-3">
+          <span class="text-lg shrink-0">⚠️</span>
+          <div>
+            <p class="font-medium text-red-300 mb-1">登录失败</p>
+            <p class="text-red-400/80 text-xs">用户名或密码不正确，请重试。</p>
+          </div>
+        </div>
       </div>
       {% endif %}
 
       <form method="post" class="space-y-5" novalidate>
         {% csrf_token %}
 
-        <!-- 用户名 -->
         <div>
-          <label for="id_username" class="block text-sm font-medium text-slate-300 mb-1.5">用户名</label>
-          <input
-            type="text"
-            name="username"
-            id="id_username"
-            autocomplete="username"
-            required
-            autofocus
-            class="w-full px-4 py-2.5 bg-gray-950/80 border {% if form.username.errors %}border-red-700{% else %}border-slate-800{% endif %} rounded-xl text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition"
-            placeholder="输入你的用户名"
-          >
-          {% if form.username.errors %}
-            <p class="mt-1 text-xs text-red-400">{{ form.username.errors.0 }}</p>
-          {% endif %}
+          <label for="id_username" class="block text-sm font-medium text-stone-400 mb-1.5">用户名</label>
+          <input type="text" name="username" id="id_username"
+                 autocomplete="username" required autofocus
+                 placeholder="输入你的用户名"
+                 class="w-full px-4 py-3 bg-white/[0.03] border {% if form.username.errors %}border-red-800{% else %}border-white/[0.08]{% endif %} rounded-xl text-stone-200 placeholder-stone-600 focus:outline-none focus:ring-2 focus:ring-amber-600/30 focus:border-amber-700/40 transition text-sm">
         </div>
 
-        <!-- 密码 -->
         <div>
-          <label for="id_password" class="block text-sm font-medium text-slate-300 mb-1.5">密码</label>
-          <input
-            type="password"
-            name="password"
-            id="id_password"
-            autocomplete="current-password"
-            required
-            class="w-full px-4 py-2.5 bg-gray-950/80 border {% if form.password.errors %}border-red-700{% else %}border-slate-800{% endif %} rounded-xl text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition"
-            placeholder="输入你的密码"
-          >
-          {% if form.password.errors %}
-            <p class="mt-1 text-xs text-red-400">{{ form.password.errors.0 }}</p>
-          {% endif %}
+          <label for="id_password" class="block text-sm font-medium text-stone-400 mb-1.5">密码</label>
+          <input type="password" name="password" id="id_password"
+                 autocomplete="current-password" required
+                 placeholder="输入你的密码"
+                 class="w-full px-4 py-3 bg-white/[0.03] border {% if form.password.errors %}border-red-800{% else %}border-white/[0.08]{% endif %} rounded-xl text-stone-200 placeholder-stone-600 focus:outline-none focus:ring-2 focus:ring-amber-600/30 focus:border-amber-700/40 transition text-sm">
         </div>
 
-        <button
-          type="submit"
-          class="w-full py-2.5 bg-amber-600 hover:bg-amber-500 active:bg-amber-700 text-white font-medium rounded-xl transition focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-gray-950"
-        >
+        <button type="submit"
+                class="w-full py-3 bg-amber-600 hover:bg-amber-500 active:bg-amber-700 text-white font-medium rounded-xl transition focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:ring-offset-2 focus:ring-offset-gray-950 text-sm tracking-wide">
           登录
         </button>
       </form>
 
-      <!-- 底部链接（移动端） -->
-      <p class="lg:hidden text-center text-sm text-slate-500 mt-6">
+      <p class="lg:hidden text-center text-sm text-stone-500 mt-6">
         还没有账号？<a href="{% url 'register' %}" class="text-amber-400 hover:text-amber-300 font-medium">立即注册</a>
       </p>
     </div>
