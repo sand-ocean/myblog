@@ -3,40 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}我的博客{% endblock %}</title>
+    <title>{% block title %}墨痕 · 我的博客{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        display: ['"Noto Serif SC"', 'serif'],
+                    },
+                },
+            },
         }
     </script>
+    <!-- 衬线字体：标题用 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* 自定义滚动条 */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        /* 选中文字 */
+        ::selection { background: rgba(217, 119, 6, 0.3); color: #fef3c7; }
+        /* 毛玻璃卡片悬停 */
+        .card-glass { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .card-glass:hover { transform: translateY(-2px); }
+        /* 装饰线 */
+        .ornament {
+            display: flex; align-items: center; gap: 1rem;
+            color: #78716c;
+        }
+        .ornament::before, .ornament::after {
+            content: ''; flex: 1; height: 1px;
+            background: linear-gradient(to right, transparent, #78716c33, transparent);
+        }
+    </style>
 </head>
-<body class="bg-gray-950 text-slate-200 min-h-screen">
+<body class="bg-gray-950 text-stone-300 min-h-screen antialiased">
+
+    <!-- 背景纹理 -->
+    <div class="fixed inset-0 pointer-events-none opacity-[0.015]"
+         style="background-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 40%22><text y=%2232%22 font-size=%2232%22>✦</text></svg>'); background-size: 200px 200px;">
+    </div>
+
+    <!-- 顶部渐变装饰线 -->
+    <div class="fixed top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-amber-600/50 to-transparent z-50"></div>
+
     <!-- 导航栏 -->
-    <nav class="bg-gray-950/80 backdrop-blur border-b border-slate-900/50">
-        <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-            <a href="{% url 'post_list' %}" class="text-xl font-bold text-slate-100 hover:text-amber-400 transition">📝 我的博客</a>
-            <div class="flex gap-4 text-sm">
+    <nav class="sticky top-0 z-40 bg-gray-950/70 backdrop-blur-xl border-b border-white/[0.04]">
+        <div class="max-w-4xl mx-auto px-5 py-3.5 flex items-center justify-between">
+            <a href="{% url 'post_list' %}"
+               class="group flex items-center gap-2.5 text-lg font-bold text-stone-200 hover:text-amber-400 transition">
+                <span class="w-8 h-8 bg-amber-600/15 rounded-lg flex items-center justify-center text-amber-500 group-hover:bg-amber-600/25 transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                    </svg>
+                </span>
+                <span class="hidden sm:inline font-display tracking-wide">墨痕</span>
+            </a>
+
+            <div class="flex items-center gap-1 text-sm">
                 {% if user.is_authenticated %}
-                    <span class="text-slate-400">👋 {{ user.username }}</span>
-                    <a href="{% url 'post_new' %}" class="text-amber-400 hover:text-amber-300 font-medium">＋ 写文章</a>
-                    <a href="{% url 'logout' %}" class="text-slate-500 hover:text-slate-300 transition">退出</a>
+                    <span class="hidden sm:inline text-stone-500 mr-2">👋 {{ user.username }}</span>
+                    <a href="{% url 'post_new' %}"
+                       class="flex items-center gap-1 px-3.5 py-2 bg-amber-600/10 border border-amber-700/30 text-amber-400 rounded-xl hover:bg-amber-600/20 hover:border-amber-600/40 transition text-sm font-medium">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        <span class="hidden sm:inline">写文章</span>
+                    </a>
+                    <a href="{% url 'logout' %}"
+                       class="px-3 py-2 text-stone-500 hover:text-stone-300 rounded-lg hover:bg-white/[0.03] transition">退出</a>
                 {% else %}
-                    <a href="{% url 'login' %}" class="text-amber-400 hover:text-amber-300">登录</a>
-                    <a href="{% url 'register' %}" class="text-slate-500 hover:text-slate-300 transition">注册</a>
+                    <a href="{% url 'login' %}"
+                       class="px-4 py-2 text-amber-400 hover:text-amber-300 rounded-lg hover:bg-amber-600/10 transition font-medium">登录</a>
+                    <a href="{% url 'register' %}"
+                       class="px-4 py-2 text-stone-400 hover:text-stone-200 rounded-lg hover:bg-white/[0.03] transition">注册</a>
                 {% endif %}
             </div>
         </div>
     </nav>
 
     <!-- 主内容 -->
-    <main class="max-w-4xl mx-auto px-4 py-8">
+    <main class="relative max-w-4xl mx-auto px-5 py-10">
         {% block content %}{% endblock %}
     </main>
 
     <!-- 页脚 -->
-    <footer class="border-t border-slate-900/50 mt-12 py-6 text-center text-sm text-slate-700">
-        Powered by Django — 我的第一个博客
+    <footer class="relative border-t border-white/[0.04] mt-16">
+        <div class="max-w-4xl mx-auto px-5 py-10">
+            <div class="ornament mb-6 text-xs tracking-widest">✦ ✦ ✦</div>
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-stone-600">
+                <p>以墨为痕，记录时光</p>
+                <div class="flex items-center gap-6">
+                    <span>Django · Tailwind</span>
+                    <span class="hidden sm:inline">Made with ☕</span>
+                </div>
+            </div>
+        </div>
     </footer>
+
 </body>
 </html>

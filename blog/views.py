@@ -66,6 +66,7 @@ def post_new(request):
         if form.is_valid():
             post = form.save(commit=False)    # 暂不写入
             post.author = request.user         # 补上作者
+            post.status = 'published' if request.POST.get('action') == 'publish' else 'draft'
             post.save()                        # 现在写入
             return redirect('post_list')
     else:
@@ -85,7 +86,9 @@ def post_edit(request, slug):
     if request.method == 'POST':
         form = PostForm(request.POST, instance=post)
         if form.is_valid():
-            form.save()
+            post = form.save(commit=False)
+            post.status = 'published' if request.POST.get('action') == 'publish' else 'draft'
+            post.save()
             return redirect('post_list')
     else:
         form = PostForm(instance=post)         # GET → 填充已有数据
