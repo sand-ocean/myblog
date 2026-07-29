@@ -2,21 +2,21 @@
 {% block title %}分类：{{ category.name }}{% endblock %}
 {% block content %}
 
-<h1 class="text-2xl font-bold text-violet-100 mb-2">📂 {{ category.name }}</h1>
-<p class="text-violet-500 mb-6">共 {{ posts.count }} 篇文章</p>
+<h1 class="text-2xl font-bold text-slate-100 mb-2">📂 {{ category.name }}</h1>
+<p class="text-slate-500 mb-6">共 {{ posts.count }} 篇文章</p>
 
 {% for post in posts %}
-    <article class="bg-violet-950/50 border border-violet-900/50 rounded-lg p-6 mb-4 hover:border-violet-800 transition">
+    <article class="bg-slate-950/50 border border-slate-900/50 rounded-lg p-6 mb-4 hover:border-slate-800 transition">
         <h2 class="text-xl font-bold mb-2">
-            <a href="{% url 'post_detail' post.slug %}" class="text-pink-400 hover:text-pink-300">{{ post.title }}</a>
+            <a href="{% url 'post_detail' post.slug %}" class="text-amber-400 hover:text-amber-300">{{ post.title }}</a>
         </h2>
-        <p class="text-sm text-violet-500 mb-3">
-            作者：<span class="text-violet-400">{{ post.author.username }}</span> | {{ post.created_at|date:"Y-m-d" }}
+        <p class="text-sm text-slate-500 mb-3">
+            作者：<span class="text-slate-400">{{ post.author.username }}</span> | {{ post.created_at|date:"Y-m-d" }}
         </p>
-        <p class="text-violet-300 leading-relaxed">{{ post.content|truncatechars:150 }}</p>
+        <p class="text-slate-300 leading-relaxed">{{ post.content|truncatechars:150 }}</p>
     </article>
 {% empty %}
-    <div class="text-center py-12 text-violet-700">
+    <div class="text-center py-12 text-slate-700">
         <p class="text-5xl mb-4">📭</p>
         <p>这个分类下还没有文章</p>
     </div>

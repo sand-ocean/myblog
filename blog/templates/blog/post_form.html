@@ -8,10 +8,10 @@
   <!-- 顶部栏 -->
   <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
     <div>
-      <h1 class="text-2xl font-bold text-violet-100">
+      <h1 class="text-2xl font-bold text-slate-100">
         {% if is_edit %}✏️ 编辑文章{% else %}✍️ 写文章{% endif %}
       </h1>
-      <p class="text-violet-500 text-sm mt-1">
+      <p class="text-slate-500 text-sm mt-1">
         {% if is_edit %}
           最后更新：{{ form.instance.updated_at|date:"Y-m-d H:i" }}
         {% else %}
@@ -22,11 +22,11 @@
     <!-- 桌面端操作按钮 -->
     <div class="hidden sm:flex items-center gap-3">
       <a href="{% url 'post_list' %}"
-         class="px-4 py-2 border border-violet-800 text-violet-400 rounded-xl hover:bg-violet-900/50 hover:text-violet-200 transition text-sm font-medium">
+         class="px-4 py-2 border border-slate-800 text-slate-400 rounded-xl hover:bg-slate-900/50 hover:text-slate-200 transition text-sm font-medium">
         取消
       </a>
       <button type="submit" form="post-form"
-              class="px-5 py-2 bg-pink-600 hover:bg-pink-500 active:bg-pink-700 text-white rounded-xl font-medium transition text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 focus:ring-offset-indigo-950">
+              class="px-5 py-2 bg-amber-600 hover:bg-amber-500 active:bg-amber-700 text-white rounded-xl font-medium transition text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-gray-950">
         {% if is_edit %}保存修改{% else %}发布文章{% endif %}
       </button>
     </div>
@@ -50,7 +50,7 @@
 
     <!-- 标题 -->
     <div>
-      <label for="id_title" class="block text-sm font-medium text-violet-300 mb-1.5">
+      <label for="id_title" class="block text-sm font-medium text-slate-300 mb-1.5">
         标题 <span class="text-red-400">*</span>
       </label>
       <input
@@ -62,7 +62,7 @@
         autofocus
         maxlength="200"
         placeholder="给你的文章起个吸引人的标题…"
-        class="w-full px-4 py-3 bg-indigo-950/60 border {% if form.title.errors %}border-red-700{% else %}border-violet-800{% endif %} rounded-xl text-violet-100 text-lg placeholder-violet-600 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
+        class="w-full px-4 py-3 bg-gray-950/60 border {% if form.title.errors %}border-red-700{% else %}border-slate-800{% endif %} rounded-xl text-slate-100 text-lg placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition"
       >
       <div class="flex items-center justify-between mt-1.5">
         {% if form.title.errors %}
@@ -70,17 +70,17 @@
         {% else %}
           <span></span>
         {% endif %}
-        <span class="text-xs text-violet-600" id="title-count">0 / 200</span>
+        <span class="text-xs text-slate-600" id="title-count">0 / 200</span>
       </div>
     </div>
 
     <!-- URL 别名 -->
     <div>
-      <label for="id_slug" class="block text-sm font-medium text-violet-300 mb-1.5">
+      <label for="id_slug" class="block text-sm font-medium text-slate-300 mb-1.5">
         URL 别名 <span class="text-red-400">*</span>
       </label>
       <div class="relative">
-        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-violet-600 text-sm select-none">/post/</span>
+        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 text-sm select-none">/post/</span>
         <input
           type="text"
           name="slug"
@@ -89,19 +89,19 @@
           required
           maxlength="200"
           placeholder="my-awesome-post"
-          class="w-full pl-16 pr-4 py-3 bg-indigo-950/60 border {% if form.slug.errors %}border-red-700{% else %}border-violet-800{% endif %} rounded-xl text-violet-100 placeholder-violet-600 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
+          class="w-full pl-16 pr-4 py-3 bg-gray-950/60 border {% if form.slug.errors %}border-red-700{% else %}border-slate-800{% endif %} rounded-xl text-slate-100 placeholder-slate-600 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition"
         >
       </div>
       {% if form.slug.errors %}
         <p class="mt-1 text-xs text-red-400">{{ form.slug.errors.0 }}</p>
       {% else %}
-        <p class="mt-1 text-xs text-violet-600">英文、数字和连字符组成，如 my-first-post</p>
+        <p class="mt-1 text-xs text-slate-600">英文、数字和连字符组成，如 my-first-post</p>
       {% endif %}
     </div>
 
     <!-- 正文 -->
     <div>
-      <label for="id_content" class="block text-sm font-medium text-violet-300 mb-1.5">
+      <label for="id_content" class="block text-sm font-medium text-slate-300 mb-1.5">
         正文 <span class="text-red-400">*</span>
       </label>
       <textarea
@@ -110,7 +110,7 @@
         required
         rows="16"
         placeholder="开始书写你的故事…&#10;&#10;支持纯文本和 Markdown 格式。"
-        class="w-full px-4 py-4 bg-indigo-950/60 border {% if form.content.errors %}border-red-700{% else %}border-violet-800{% endif %} rounded-xl text-violet-100 placeholder-violet-600 leading-relaxed resize-y focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition font-mono text-sm"
+        class="w-full px-4 py-4 bg-gray-950/60 border {% if form.content.errors %}border-red-700{% else %}border-slate-800{% endif %} rounded-xl text-slate-100 placeholder-slate-600 leading-relaxed resize-y focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition font-mono text-sm"
       >{{ form.content.value|default:'' }}</textarea>
       <div class="flex items-center justify-between mt-1.5">
         {% if form.content.errors %}
@@ -118,7 +118,7 @@
         {% else %}
           <span></span>
         {% endif %}
-        <span class="text-xs text-violet-600" id="char-count">0 字</span>
+        <span class="text-xs text-slate-600" id="char-count">0 字</span>
       </div>
     </div>
 
@@ -126,11 +126,11 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <!-- 分类 -->
       <div>
-        <label for="id_category" class="block text-sm font-medium text-violet-300 mb-1.5">分类</label>
+        <label for="id_category" class="block text-sm font-medium text-slate-300 mb-1.5">分类</label>
         <select
           name="category"
           id="id_category"
-          class="w-full px-4 py-3 bg-indigo-950/60 border border-violet-800 rounded-xl text-violet-100 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition cursor-pointer"
+          class="w-full px-4 py-3 bg-gray-950/60 border border-slate-800 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition cursor-pointer"
         >
           {% for choice in form.category.field.queryset %}
             <option value="{{ choice.id }}"
@@ -143,7 +143,7 @@
 
       <!-- 状态 -->
       <div>
-        <label class="block text-sm font-medium text-violet-300 mb-1.5">状态</label>
+        <label class="block text-sm font-medium text-slate-300 mb-1.5">状态</label>
         <div class="flex gap-2">
           {% for value, label in form.status.field.choices %}
           <label class="flex-1 cursor-pointer">
@@ -171,13 +171,13 @@
     </div>
 
     <!-- 移动端操作按钮（固定在底部） -->
-    <div class="sm:hidden flex gap-3 pt-4 border-t border-violet-900/50">
+    <div class="sm:hidden flex gap-3 pt-4 border-t border-slate-900/50">
       <a href="{% url 'post_list' %}"
-         class="flex-1 px-4 py-3 border border-violet-800 text-violet-400 rounded-xl hover:bg-violet-900/50 text-center text-sm font-medium transition">
+         class="flex-1 px-4 py-3 border border-slate-800 text-slate-400 rounded-xl hover:bg-slate-900/50 text-center text-sm font-medium transition">
         取消
       </a>
       <button type="submit"
-              class="flex-[2] px-5 py-3 bg-pink-600 hover:bg-pink-500 active:bg-pink-700 text-white rounded-xl font-medium text-sm transition focus:outline-none focus:ring-2 focus:ring-pink-500">
+              class="flex-[2] px-5 py-3 bg-amber-600 hover:bg-amber-500 active:bg-amber-700 text-white rounded-xl font-medium text-sm transition focus:outline-none focus:ring-2 focus:ring-amber-500">
         {% if is_edit %}保存修改{% else %}发布文章{% endif %}
       </button>
     </div>
@@ -194,7 +194,7 @@
     function update() {
       const len = title.value.length;
       count.textContent = len + ' / 200';
-      count.className = 'text-xs ' + (len > 180 ? 'text-yellow-400' : len >= 200 ? 'text-red-400' : 'text-violet-600');
+      count.className = 'text-xs ' + (len > 180 ? 'text-yellow-400' : len >= 200 ? 'text-red-400' : 'text-slate-600');
     }
     title.addEventListener('input', update);
     update();

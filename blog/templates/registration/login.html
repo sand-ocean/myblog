@@ -3,27 +3,27 @@
 {% block content %}
 
 <div class="min-h-[80vh] flex items-center justify-center px-4">
-  <div class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 bg-violet-950/30 border border-violet-900/50 rounded-2xl overflow-hidden shadow-2xl shadow-black/20">
+  <div class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 bg-slate-950/30 border border-slate-900/50 rounded-2xl overflow-hidden shadow-2xl shadow-black/20">
 
     <!-- 左侧：品牌区 -->
-    <div class="hidden lg:flex flex-col justify-center p-12 bg-gradient-to-br from-indigo-900/60 to-violet-900/40 border-r border-violet-900/30">
+    <div class="hidden lg:flex flex-col justify-center p-12 bg-gradient-to-br from-gray-900/60 to-slate-900/40 border-r border-slate-900/30">
       <div class="space-y-6">
-        <div class="w-12 h-12 bg-pink-600/20 rounded-xl flex items-center justify-center">
+        <div class="w-12 h-12 bg-amber-600/20 rounded-xl flex items-center justify-center">
           <span class="text-2xl">📝</span>
         </div>
-        <h1 class="text-3xl font-bold text-violet-100 leading-tight">
+        <h1 class="text-3xl font-bold text-slate-100 leading-tight">
           欢迎回来
         </h1>
-        <p class="text-violet-400 leading-relaxed">
+        <p class="text-slate-400 leading-relaxed">
           登录后可以写文章、发表评论、和更多读者互动。
           每一次书写，都是与自己的对话。
         </p>
-        <div class="flex gap-4 pt-4 text-sm text-violet-500">
+        <div class="flex gap-4 pt-4 text-sm text-slate-500">
           <span class="flex items-center gap-1.5">
-            <span class="w-1.5 h-1.5 bg-pink-500 rounded-full"></span> Markdown 支持
+            <span class="w-1.5 h-1.5 bg-amber-500 rounded-full"></span> Markdown 支持
           </span>
           <span class="flex items-center gap-1.5">
-            <span class="w-1.5 h-1.5 bg-pink-500 rounded-full"></span> 草稿自动保存
+            <span class="w-1.5 h-1.5 bg-amber-500 rounded-full"></span> 草稿自动保存
           </span>
         </div>
       </div>
@@ -34,12 +34,12 @@
       <!-- 移动端品牌 -->
       <div class="lg:hidden mb-8 text-center">
         <span class="text-3xl">📝</span>
-        <h1 class="text-2xl font-bold text-violet-100 mt-2">欢迎回来</h1>
-        <p class="text-violet-500 text-sm mt-1">登录你的博客账号</p>
+        <h1 class="text-2xl font-bold text-slate-100 mt-2">欢迎回来</h1>
+        <p class="text-slate-500 text-sm mt-1">登录你的博客账号</p>
       </div>
 
-      <h2 class="hidden lg:block text-2xl font-bold text-violet-100 mb-2">登录</h2>
-      <p class="hidden lg:block text-violet-500 text-sm mb-8">还没有账号？<a href="{% url 'register' %}" class="text-pink-400 hover:text-pink-300 font-medium">立即注册</a></p>
+      <h2 class="hidden lg:block text-2xl font-bold text-slate-100 mb-2">登录</h2>
+      <p class="hidden lg:block text-slate-500 text-sm mb-8">还没有账号？<a href="{% url 'register' %}" class="text-amber-400 hover:text-amber-300 font-medium">立即注册</a></p>
 
       {% if form.errors %}
       <div class="mb-6 p-4 bg-red-950/30 border border-red-900/50 rounded-xl text-sm text-red-300" role="alert">
@@ -53,7 +53,7 @@
 
         <!-- 用户名 -->
         <div>
-          <label for="id_username" class="block text-sm font-medium text-violet-300 mb-1.5">用户名</label>
+          <label for="id_username" class="block text-sm font-medium text-slate-300 mb-1.5">用户名</label>
           <input
             type="text"
             name="username"
@@ -61,7 +61,7 @@
             autocomplete="username"
             required
             autofocus
-            class="w-full px-4 py-2.5 bg-indigo-950/80 border {% if form.username.errors %}border-red-700{% else %}border-violet-800{% endif %} rounded-xl text-violet-100 placeholder-violet-600 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
+            class="w-full px-4 py-2.5 bg-gray-950/80 border {% if form.username.errors %}border-red-700{% else %}border-slate-800{% endif %} rounded-xl text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition"
             placeholder="输入你的用户名"
           >
           {% if form.username.errors %}
@@ -71,14 +71,14 @@
 
         <!-- 密码 -->
         <div>
-          <label for="id_password" class="block text-sm font-medium text-violet-300 mb-1.5">密码</label>
+          <label for="id_password" class="block text-sm font-medium text-slate-300 mb-1.5">密码</label>
           <input
             type="password"
             name="password"
             id="id_password"
             autocomplete="current-password"
             required
-            class="w-full px-4 py-2.5 bg-indigo-950/80 border {% if form.password.errors %}border-red-700{% else %}border-violet-800{% endif %} rounded-xl text-violet-100 placeholder-violet-600 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
+            class="w-full px-4 py-2.5 bg-gray-950/80 border {% if form.password.errors %}border-red-700{% else %}border-slate-800{% endif %} rounded-xl text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition"
             placeholder="输入你的密码"
           >
           {% if form.password.errors %}
@@ -88,15 +88,15 @@
 
         <button
           type="submit"
-          class="w-full py-2.5 bg-pink-600 hover:bg-pink-500 active:bg-pink-700 text-white font-medium rounded-xl transition focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 focus:ring-offset-indigo-950"
+          class="w-full py-2.5 bg-amber-600 hover:bg-amber-500 active:bg-amber-700 text-white font-medium rounded-xl transition focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-gray-950"
         >
           登录
         </button>
       </form>
 
       <!-- 底部链接（移动端） -->
-      <p class="lg:hidden text-center text-sm text-violet-500 mt-6">
-        还没有账号？<a href="{% url 'register' %}" class="text-pink-400 hover:text-pink-300 font-medium">立即注册</a>
+      <p class="lg:hidden text-center text-sm text-slate-500 mt-6">
+        还没有账号？<a href="{% url 'register' %}" class="text-amber-400 hover:text-amber-300 font-medium">立即注册</a>
       </p>
     </div>
 

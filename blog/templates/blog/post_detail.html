@@ -2,11 +2,11 @@
 {% block title %}{{ post.title }}{% endblock %}
 {% block content %}
 
-<article class="bg-violet-950/50 border border-violet-900/50 rounded-lg p-8 mb-6">
-    <h1 class="text-3xl font-bold text-violet-100 mb-4">{{ post.title }}</h1>
-    <div class="flex flex-wrap gap-4 text-sm text-violet-500 mb-6 pb-6 border-b border-violet-900/50">
-        <span>👤 <span class="text-violet-400">{{ post.author.username }}</span></span>
-        <span>📂 <a href="{% url 'category_posts' post.category.slug %}" class="text-pink-400 hover:text-pink-300">{{ post.category.name }}</a></span>
+<article class="bg-slate-950/50 border border-slate-900/50 rounded-lg p-8 mb-6">
+    <h1 class="text-3xl font-bold text-slate-100 mb-4">{{ post.title }}</h1>
+    <div class="flex flex-wrap gap-4 text-sm text-slate-500 mb-6 pb-6 border-b border-slate-900/50">
+        <span>👤 <span class="text-slate-400">{{ post.author.username }}</span></span>
+        <span>📂 <a href="{% url 'category_posts' post.category.slug %}" class="text-amber-400 hover:text-amber-300">{{ post.category.name }}</a></span>
         <span>📅 {{ post.created_at|date:"Y-m-d H:i" }}</span>
         {% if post.status == 'draft' %}
             <span class="bg-yellow-900 text-yellow-400 px-2 py-0.5 rounded text-xs">草稿</span>
@@ -14,25 +14,25 @@
     </div>
 
     <!-- 点赞 -->
-    <div class="flex items-center gap-3 mb-6 pb-6 border-b border-violet-900/50">
+    <div class="flex items-center gap-3 mb-6 pb-6 border-b border-slate-900/50">
         <form method="post" action="{% url 'like_post' post.slug %}">
             {% csrf_token %}
             <button type="submit" class="flex items-center gap-1 px-4 py-2 rounded-lg transition text-sm
-                {% if user in post.likes.all %}bg-pink-900/50 text-pink-400 hover:bg-pink-900{% else %}bg-violet-900/50 text-violet-500 hover:bg-violet-900{% endif %}">
+                {% if user in post.likes.all %}bg-amber-900/50 text-amber-400 hover:bg-amber-900{% else %}bg-slate-900/50 text-slate-500 hover:bg-slate-900{% endif %}">
                 {% if user in post.likes.all %}❤️{% else %}🤍{% endif %}
                 {{ post.likes.count }}
             </button>
         </form>
     </div>
 
-    <div class="text-violet-200 leading-relaxed text-lg whitespace-pre-wrap">
+    <div class="text-slate-200 leading-relaxed text-lg whitespace-pre-wrap">
         {{ post.content }}
     </div>
 
     {% if user == post.author %}
-    <div class="flex gap-3 mt-8 pt-6 border-t border-violet-900/50">
+    <div class="flex gap-3 mt-8 pt-6 border-t border-slate-900/50">
         <a href="{% url 'post_edit' post.slug %}"
-           class="px-4 py-2 bg-pink-700 text-white rounded-lg hover:bg-pink-600 transition text-sm">编辑</a>
+           class="px-4 py-2 bg-amber-700 text-white rounded-lg hover:bg-amber-600 transition text-sm">编辑</a>
         <form method="post" action="{% url 'post_delete' post.slug %}">
             {% csrf_token %}
             <button type="submit" onclick="return confirm('确定删除？')"
@@ -42,33 +42,33 @@
     {% endif %}
 </article>
 
-<section class="bg-violet-950/50 border border-violet-900/50 rounded-lg p-8">
-    <h2 class="text-xl font-bold text-violet-100 mb-6">评论 ({{ comments.count }})</h2>
+<section class="bg-slate-950/50 border border-slate-900/50 rounded-lg p-8">
+    <h2 class="text-xl font-bold text-slate-100 mb-6">评论 ({{ comments.count }})</h2>
 
     {% for comment in comments %}
-        <div class="border-b border-violet-900/50 py-4 last:border-0">
-            <p class="text-sm text-violet-500 mb-1">
-                <strong class="text-violet-300">{{ comment.author.username }}</strong>
+        <div class="border-b border-slate-900/50 py-4 last:border-0">
+            <p class="text-sm text-slate-500 mb-1">
+                <strong class="text-slate-300">{{ comment.author.username }}</strong>
                 · {{ comment.created_at|date:"Y-m-d H:i" }}
             </p>
-            <p class="text-violet-400">{{ comment.content }}</p>
+            <p class="text-slate-400">{{ comment.content }}</p>
         </div>
     {% empty %}
-        <p class="text-violet-700 text-center py-4">暂无评论</p>
+        <p class="text-slate-700 text-center py-4">暂无评论</p>
     {% endfor %}
 
     {% if user.is_authenticated %}
-        <form method="post" action="{% url 'post_comments' post.slug %}" class="mt-6 pt-6 border-t border-violet-900/50">
+        <form method="post" action="{% url 'post_comments' post.slug %}" class="mt-6 pt-6 border-t border-slate-900/50">
             {% csrf_token %}
-            <div class="space-y-3 [&_label]:text-violet-400 [&_label]:block [&_label]:mb-1 [&_textarea]:w-full [&_textarea]:px-4 [&_textarea]:py-3 [&_textarea]:bg-violet-950 [&_textarea]:border [&_textarea]:border-violet-800 [&_textarea]:rounded-lg [&_textarea]:text-violet-200 [&_textarea]:placeholder-violet-600 [&_textarea]:focus:outline-none [&_textarea]:focus:ring-2 [&_textarea]:focus:ring-pink-500">
+            <div class="space-y-3 [&_label]:text-slate-400 [&_label]:block [&_label]:mb-1 [&_textarea]:w-full [&_textarea]:px-4 [&_textarea]:py-3 [&_textarea]:bg-slate-950 [&_textarea]:border [&_textarea]:border-slate-800 [&_textarea]:rounded-lg [&_textarea]:text-slate-200 [&_textarea]:placeholder-slate-600 [&_textarea]:focus:outline-none [&_textarea]:focus:ring-2 [&_textarea]:focus:ring-amber-500">
                 {{ form.as_p }}
             </div>
             <button type="submit"
-                    class="mt-2 px-6 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-500 transition">提交评论</button>
+                    class="mt-2 px-6 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-500 transition">提交评论</button>
         </form>
     {% else %}
-        <p class="mt-6 pt-6 border-t border-violet-900/50 text-center text-violet-600">
-            <a href="{% url 'login' %}" class="text-pink-400 hover:text-pink-300">登录</a>后可以评论
+        <p class="mt-6 pt-6 border-t border-slate-900/50 text-center text-slate-600">
+            <a href="{% url 'login' %}" class="text-amber-400 hover:text-amber-300">登录</a>后可以评论
         </p>
     {% endif %}
 </section>

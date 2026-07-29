@@ -11,19 +11,19 @@
         }
     </script>
 </head>
-<body class="bg-indigo-950 text-violet-200 min-h-screen">
+<body class="bg-gray-950 text-slate-200 min-h-screen">
     <!-- 导航栏 -->
-    <nav class="bg-indigo-950/80 backdrop-blur border-b border-violet-900/50">
+    <nav class="bg-gray-950/80 backdrop-blur border-b border-slate-900/50">
         <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-            <a href="{% url 'post_list' %}" class="text-xl font-bold text-violet-100 hover:text-pink-400 transition">📝 我的博客</a>
+            <a href="{% url 'post_list' %}" class="text-xl font-bold text-slate-100 hover:text-amber-400 transition">📝 我的博客</a>
             <div class="flex gap-4 text-sm">
                 {% if user.is_authenticated %}
-                    <span class="text-violet-400">👋 {{ user.username }}</span>
-                    <a href="{% url 'post_new' %}" class="text-pink-400 hover:text-pink-300 font-medium">＋ 写文章</a>
-                    <a href="{% url 'logout' %}" class="text-violet-500 hover:text-violet-300 transition">退出</a>
+                    <span class="text-slate-400">👋 {{ user.username }}</span>
+                    <a href="{% url 'post_new' %}" class="text-amber-400 hover:text-amber-300 font-medium">＋ 写文章</a>
+                    <a href="{% url 'logout' %}" class="text-slate-500 hover:text-slate-300 transition">退出</a>
                 {% else %}
-                    <a href="{% url 'login' %}" class="text-pink-400 hover:text-pink-300">登录</a>
-                    <a href="{% url 'register' %}" class="text-violet-500 hover:text-violet-300 transition">注册</a>
+                    <a href="{% url 'login' %}" class="text-amber-400 hover:text-amber-300">登录</a>
+                    <a href="{% url 'register' %}" class="text-slate-500 hover:text-slate-300 transition">注册</a>
                 {% endif %}
             </div>
         </div>
@@ -35,7 +35,7 @@
     </main>
 
     <!-- 页脚 -->
-    <footer class="border-t border-violet-900/50 mt-12 py-6 text-center text-sm text-violet-700">
+    <footer class="border-t border-slate-900/50 mt-12 py-6 text-center text-sm text-slate-700">
         Powered by Django — 我的第一个博客
     </footer>
 </body>
