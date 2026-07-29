@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}{% if form.instance.pk %}编辑：{{ form.instance.title }}{% else %}写文章{% endif %} · 墨痕{% endblock %}
+{% block title %}{% if form.instance.pk %}编辑：{{ form.instance.title }}{% else %}写文章{% endif %} · mineblog{% endblock %}
 {% block content %}
 
 {% with is_edit=form.instance.pk %}
