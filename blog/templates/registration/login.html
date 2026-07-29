@@ -1,100 +1,45 @@
 {% extends 'base.html' %}
-{% block title %}登录 · mineblog{% endblock %}
+{% block title %}登录 - mineblog{% endblock %}
 {% block content %}
 
-<div class="min-h-[75vh] flex items-center justify-center px-4">
-  <div class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 bg-white/[0.02] border border-white/[0.05] rounded-3xl overflow-hidden shadow-2xl shadow-black/30">
-
-    <!-- 左侧：品牌 -->
-    <div class="hidden lg:flex flex-col justify-between p-12 bg-gradient-to-br from-amber-950/30 via-gray-950 to-gray-950 border-r border-white/[0.04]">
-      <div>
-        <a href="{% url 'post_list' %}" class="inline-flex items-center gap-2 text-stone-400 hover:text-amber-400 transition text-sm mb-12">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-          返回首页
-        </a>
-      </div>
-      <div class="space-y-6">
-        <div class="w-14 h-14 bg-amber-600/15 rounded-2xl flex items-center justify-center">
-          <svg class="w-7 h-7 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-          </svg>
-        </div>
-        <h1 class="text-3xl font-display font-black text-stone-100 leading-tight">
-          欢迎回到<br><span class="text-amber-500">mineblog</span>
-        </h1>
-        <p class="text-stone-500 leading-relaxed text-sm">
-          每一次书写，都是在时光里留下痕迹。
-          登录后继续你的创作之旅。
-        </p>
-        <div class="flex gap-4 pt-6 text-xs text-stone-600">
-          <span class="flex items-center gap-1.5">
-            <span class="w-1.5 h-1.5 bg-amber-600/60 rounded-full"></span> Markdown 写作
-          </span>
-          <span class="flex items-center gap-1.5">
-            <span class="w-1.5 h-1.5 bg-amber-600/60 rounded-full"></span> 草稿保存
-          </span>
-        </div>
-      </div>
-      <div class="text-xs text-stone-700 mt-auto pt-8 border-t border-white/[0.03]">
-        mineblog
-      </div>
+<div class="min-h-[70vh] flex items-center justify-center">
+  <div class="w-full max-w-md">
+    <div class="text-center mb-8">
+      <span class="w-14 h-14 bg-red/15 rounded-2xl flex items-center justify-center mx-auto mb-4">
+        <svg class="w-7 h-7 text-red" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="5" r="2"/><circle cx="12" cy="19" r="2"/><circle cx="5" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+      </span>
+      <h1 class="text-2xl font-bold text-white mb-2">登录 mineblog</h1>
+      <p class="text-[#999] text-sm">还没有账号？<a href="{% url 'register' %}" class="text-red hover:text-[#f05a5a] transition">立即注册</a></p>
     </div>
 
-    <!-- 右侧：表单 -->
-    <div class="p-8 sm:p-12 flex flex-col justify-center">
-      <div class="lg:hidden mb-8 text-center">
-        <span class="text-4xl">✒️</span>
-        <h1 class="text-2xl font-display font-bold text-stone-100 mt-3">欢迎回来</h1>
-        <p class="text-stone-500 text-sm mt-1">登录你的博客账号</p>
-      </div>
-
-      <h2 class="hidden lg:block text-2xl font-display font-bold text-stone-100 mb-1.5">登录</h2>
-      <p class="hidden lg:block text-stone-500 text-sm mb-8">
-        还没有账号？<a href="{% url 'register' %}" class="text-amber-400 hover:text-amber-300 font-medium underline decoration-amber-700 underline-offset-4">立即注册</a>
-      </p>
-
+    <div class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-6">
       {% if form.errors %}
-      <div class="mb-6 p-4 bg-red-950/20 border border-red-900/30 rounded-2xl text-sm" role="alert">
-        <div class="flex items-start gap-3">
-          <span class="text-lg shrink-0">⚠️</span>
-          <div>
-            <p class="font-medium text-red-300 mb-1">登录失败</p>
-            <p class="text-red-400/80 text-xs">用户名或密码不正确，请重试。</p>
-          </div>
-        </div>
+      <div class="mb-5 p-4 bg-red/5 border border-red/20 rounded-lg text-xs" role="alert">
+        <p class="text-red font-medium mb-1">登录失败</p>
+        <p class="text-[#c88]">用户名或密码不正确，请重试。</p>
       </div>
       {% endif %}
 
-      <form method="post" class="space-y-5" novalidate>
+      <form method="post" class="space-y-4" novalidate>
         {% csrf_token %}
-
         <div>
-          <label for="id_username" class="block text-sm font-medium text-stone-400 mb-1.5">用户名</label>
-          <input type="text" name="username" id="id_username"
-                 autocomplete="username" required autofocus
-                 placeholder="输入你的用户名"
-                 class="w-full px-4 py-3 bg-white/[0.03] border {% if form.username.errors %}border-red-800{% else %}border-white/[0.08]{% endif %} rounded-xl text-stone-200 placeholder-stone-600 focus:outline-none focus:ring-2 focus:ring-amber-600/30 focus:border-amber-700/40 transition text-sm">
+          <label for="id_username" class="block text-xs text-[#aaa] mb-1.5">用户名</label>
+          <input type="text" name="username" id="id_username" autocomplete="username" required autofocus
+                 placeholder="输入用户名"
+                 class="w-full px-4 py-2.5 bg-[#252525] border {% if form.username.errors %}border-red/40{% else %}border-[#333]{% endif %} rounded-lg text-[#e0e0e0] placeholder-[#666] text-sm focus:outline-none focus:ring-1 focus:ring-red/30 focus:border-red/40 transition">
         </div>
-
         <div>
-          <label for="id_password" class="block text-sm font-medium text-stone-400 mb-1.5">密码</label>
-          <input type="password" name="password" id="id_password"
-                 autocomplete="current-password" required
-                 placeholder="输入你的密码"
-                 class="w-full px-4 py-3 bg-white/[0.03] border {% if form.password.errors %}border-red-800{% else %}border-white/[0.08]{% endif %} rounded-xl text-stone-200 placeholder-stone-600 focus:outline-none focus:ring-2 focus:ring-amber-600/30 focus:border-amber-700/40 transition text-sm">
+          <label for="id_password" class="block text-xs text-[#aaa] mb-1.5">密码</label>
+          <input type="password" name="password" id="id_password" autocomplete="current-password" required
+                 placeholder="输入密码"
+                 class="w-full px-4 py-2.5 bg-[#252525] border {% if form.password.errors %}border-red/40{% else %}border-[#333]{% endif %} rounded-lg text-[#e0e0e0] placeholder-[#666] text-sm focus:outline-none focus:ring-1 focus:ring-red/30 focus:border-red/40 transition">
         </div>
-
         <button type="submit"
-                class="w-full py-3 bg-amber-600 hover:bg-amber-500 active:bg-amber-700 text-white font-medium rounded-xl transition focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:ring-offset-2 focus:ring-offset-gray-950 text-sm tracking-wide">
+                class="w-full py-2.5 bg-red hover:bg-[#f05a5a] text-white rounded-full font-medium text-sm transition">
           登录
         </button>
       </form>
-
-      <p class="lg:hidden text-center text-sm text-stone-500 mt-6">
-        还没有账号？<a href="{% url 'register' %}" class="text-amber-400 hover:text-amber-300 font-medium">立即注册</a>
-      </p>
     </div>
-
   </div>
 </div>
 {% endblock %}
