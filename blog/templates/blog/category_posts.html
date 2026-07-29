@@ -1,25 +1,28 @@
 {% extends 'base.html' %}
-{% block title %}{{ category.name }} - mineblog{% endblock %}
+{% block title %}{{ category.name }} — mineblog{% endblock %}
 {% block content %}
 
-<h1 class="mb-1">📂 {{ category.name }}</h1>
-<p class="meta mb-8">共 {{ posts.count }} 篇文章</p>
+<a href="{% url 'post_list' %}" class="label" style="display:block;margin-bottom:48px">← 返回</a>
 
-<div class="space-y-3">
+<p class="label" style="margin-bottom:8px">分类</p>
+<h1 style="margin-bottom:8px">{{ category.name }}</h1>
+<p style="color:var(--soft);font-size:13px;margin-bottom:64px">{{ posts.count }} 篇文章</p>
+
+<div class="narrow">
 {% for post in posts %}
-    <article class="card p-5 transition-colors duration-150">
-        <h2 class="mb-1.5">
-            <a href="{% url 'post_detail' post.slug %}" class="link-red" style="font-weight:500;font-size:20px">{{ post.title }}</a>
+    <article style="margin-bottom:64px">
+        <p class="label" style="margin-bottom:12px">
+            {{ post.author.username }}&ensp;·&ensp;{{ post.created_at|date:"Y.m.d" }}
+        </p>
+        <h2 style="margin-bottom:8px">
+            <a href="{% url 'post_detail' post.slug %}" style="color:var(--ink);font-size:inherit;font-weight:400">{{ post.title }}</a>
         </h2>
-        <p class="meta mb-2">{{ post.author.username }} · {{ post.created_at|date:"Y-m-d" }}</p>
-        <p style="color:var(--text-secondary);line-height:1.6">{{ post.content|truncatechars:150 }}</p>
+        <p style="color:var(--soft);font-size:13px;line-height:1.7">
+            {{ post.content|truncatechars:140 }}
+        </p>
     </article>
 {% empty %}
-    <div class="text-center py-20">
-        <p style="font-size:48px;margin-bottom:16px">📭</p>
-        <p class="meta">这个分类下还没有文章</p>
-    </div>
+    <p style="color:var(--soft);text-align:center;padding:120px 0">暂无文章</p>
 {% endfor %}
 </div>
-
 {% endblock %}

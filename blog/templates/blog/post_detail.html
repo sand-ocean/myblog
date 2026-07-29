@@ -1,210 +1,78 @@
 {% extends 'base.html' %}
-{% block title %}{{ post.title }} - mineblog{% endblock %}
+{% block title %}{{ post.title }} — mineblog{% endblock %}
 {% block content %}
 
-<div class="flex gap-8">
-  <!-- ====== 左侧边栏 ====== -->
-  <aside class="hidden lg:block w-48 shrink-0">
-    <div class="sticky top-20 space-y-5">
+<div class="narrow">
 
-      <!-- 返回 -->
-      <a href="{% url 'post_list' %}" class="inline-flex items-center gap-1.5 text-sm text-[#999] hover:text-red transition">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        返回首页
-      </a>
+    <!-- 返回链接 — 微小标签 -->
+    <a href="{% url 'post_list' %}" class="label" style="display:block;margin-bottom:48px">← 返回</a>
 
-      <!-- 分类 -->
-      <div>
-        <p class="text-[10px] text-[#666] uppercase tracking-wider mb-2">分类</p>
-        <a href="{% url 'category_posts' post.category.slug %}"
-           class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red/10 border border-red/20 rounded-full text-xs text-red hover:bg-red/20 transition">
-          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
-          {{ post.category.name }}
-        </a>
-      </div>
+    <!-- 文章头 -->
+    <header style="margin-bottom: 48px">
+        <p class="label" style="margin-bottom: 12px">
+            {{ post.category.name }}&ensp;·&ensp;{{ post.created_at|date:"Y.m.d" }}
+            {% if post.updated_at != post.created_at %}
+                &ensp;·&ensp;更新于 {{ post.updated_at|date:"Y.m.d" }}
+            {% endif %}
+            {% if post.status == 'draft' %}&ensp;·&ensp;草稿{% endif %}
+        </p>
+        <h1 style="margin-bottom:16px">{{ post.title }}</h1>
+        <p style="color:var(--soft);font-size:13px">{{ post.author.username }}</p>
+    </header>
 
-      <!-- 文章信息 -->
-      <div>
-        <p class="text-[10px] text-[#666] uppercase tracking-wider mb-2">信息</p>
-        <ul class="space-y-2 text-xs text-[#999]">
-          <li class="flex justify-between">
-            <span class="text-[#666]">发布</span>
-            <span>{{ post.created_at|date:"m-d" }}</span>
-          </li>
-          {% if post.updated_at != post.created_at %}
-          <li class="flex justify-between">
-            <span class="text-[#666]">更新</span>
-            <span>{{ post.updated_at|date:"m-d" }}</span>
-          </li>
-          {% endif %}
-          <li class="flex justify-between">
-            <span class="text-[#666]">字数</span>
-            <span>{{ post.content|length }}</span>
-          </li>
-          <li class="flex justify-between">
-            <span class="text-[#666]">点赞</span>
-            <span>{{ post.likes.count }}</span>
-          </li>
-          <li class="flex justify-between">
-            <span class="text-[#666]">评论</span>
-            <span>{{ comments.count }}</span>
-          </li>
-        </ul>
-      </div>
-
-      <!-- 状态 -->
-      {% if post.status == 'draft' %}
-      <span class="inline-block px-2.5 py-1 bg-yellow-900/20 border border-yellow-700/30 rounded-full text-yellow-500/80 text-[10px] font-medium">草稿</span>
-      {% endif %}
+    <!-- 正文 — 宽行距，舒适阅读 -->
+    <div style="font-size:16px;line-height:2;letter-spacing:0.015em">
+        {{ post.content|linebreaks }}
     </div>
-  </aside>
 
-  <!-- ====== 主内容区 ====== -->
-  <div class="flex-1 min-w-0">
-
-    <article>
-      <!-- 移动端返回 -->
-      <a href="{% url 'post_list' %}" class="lg:hidden inline-flex items-center gap-1.5 text-sm text-[#999] hover:text-red transition mb-4">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        返回
-      </a>
-
-      <!-- 文章头 -->
-      <header class="mb-8">
-        <a href="{% url 'category_posts' post.category.slug %}" class="lg:hidden inline-block px-3 py-0.5 bg-red/10 border border-red/20 rounded-full text-xs text-red mb-3 hover:bg-red/20 transition">
-          {{ post.category.name }}
-        </a>
-        <h1 class="text-2xl font-bold text-white leading-snug mb-4">{{ post.title }}</h1>
-        <div class="flex items-center gap-3 text-xs text-[#999]">
-          <span class="w-6 h-6 rounded-full bg-red/20 flex items-center justify-center text-red text-[10px] font-bold">
-            {{ post.author.username|slice:":1" }}
-          </span>
-          <a href="#" class="text-[#aaa] hover:text-red transition">{{ post.author.username }}</a>
-          <span class="text-[#444]">·</span>
-          <time>{{ post.created_at|date:"Y-m-d H:i" }}</time>
-          {% if post.updated_at != post.created_at %}
-            <span class="text-[#666] text-[11px]">（编辑于 {{ post.updated_at|date:"m-d H:i" }}）</span>
-          {% endif %}
-        </div>
-      </header>
-
-      <!-- 正文 -->
-      <div class="text-[#ccc] leading-relaxed whitespace-pre-wrap text-[15px] space-y-4 mb-10">
-        {{ post.content }}
-      </div>
-
-      <!-- 互动栏 -->
-      <div class="flex items-center justify-between py-5 border-t border-b border-[#2a2a2a]">
+    <!-- 互动 — 1px 细线分隔 -->
+    <hr>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:48px">
         <form method="post" action="{% url 'like_post' post.slug %}">
-          {% csrf_token %}
-          <button type="submit"
-                  class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border transition text-xs font-medium
-                    {% if user in post.likes.all %}
-                      bg-red/10 border-red/25 text-red
-                    {% else %}
-                      bg-[#1a1a1a] border-[#2a2a2a] text-[#999] hover:border-red/30 hover:text-red
-                    {% endif %}">
-            <span class="text-sm">{% if user in post.likes.all %}♥{% else %}♡{% endif %}</span>
-            {{ post.likes.count }}
-          </button>
+            {% csrf_token %}
+            <button type="submit" class="btn" style="font-size:12px;padding:6px 20px">
+                {% if user in post.likes.all %}♥{% else %}♡{% endif %}
+                {{ post.likes.count }}
+            </button>
         </form>
         {% if user == post.author %}
-        <div class="flex items-center gap-2">
-          <a href="{% url 'post_edit' post.slug %}" class="px-4 py-2 bg-[#1a1a1a] border border-[#2a2a2a] text-[#ccc] rounded-lg hover:border-red/30 hover:text-red transition text-xs">编辑</a>
-          <form method="post" action="{% url 'post_delete' post.slug %}" onsubmit="return confirm('确定删除？')">
-            {% csrf_token %}
-            <button type="submit" class="px-4 py-2 bg-[#1a1a1a] border border-[#2a2a2a] text-[#888] rounded-lg hover:border-red-800/30 hover:text-red transition text-xs">删除</button>
-          </form>
+        <div style="display:flex;gap:16px">
+            <a href="{% url 'post_edit' post.slug %}">编辑</a>
+            <form method="post" action="{% url 'post_delete' post.slug %}" onsubmit="return confirm('确定删除？')" style="display:inline">
+                {% csrf_token %}
+                <button type="submit" style="background:none;border:none;color:var(--soft);font-size:inherit;letter-spacing:0.04em;cursor:pointer">删除</button>
+            </form>
         </div>
         {% endif %}
-      </div>
-    </article>
+    </div>
 
     <!-- 评论区 -->
-    <section class="mt-10">
-      <h2 class="text-sm font-bold text-[#ccc] mb-6">评论 <span class="text-[#777] font-normal ml-1">{{ comments.count }}</span></h2>
+    <section>
+        <p class="label" style="margin-bottom:32px">评论&ensp;{{ comments.count }}</p>
 
-      {% for comment in comments %}
-        <div class="flex items-start gap-3 py-4 border-b border-[#222] last:border-0">
-          <span class="w-7 h-7 rounded-full bg-[#252525] flex items-center justify-center text-[#999] text-[10px] font-bold shrink-0 mt-0.5">
-            {{ comment.author.username|slice:":1" }}
-          </span>
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-2 mb-1">
-              <span class="text-xs text-[#aaa] font-medium">{{ comment.author.username }}</span>
-              <span class="text-[10px] text-[#666]">{{ comment.created_at|date:"m-d H:i" }}</span>
+        {% for comment in comments %}
+            <div style="margin-bottom:32px;padding-bottom:32px;border-bottom:1px solid var(--hairline)">
+                <p style="margin-bottom:6px">
+                    <span style="font-size:13px">{{ comment.author.username }}</span>
+                    <span class="label" style="margin-left:8px">{{ comment.created_at|date:"m.d H:i" }}</span>
+                </p>
+                <p style="color:var(--soft);font-size:14px;line-height:1.7">{{ comment.content }}</p>
             </div>
-            <p class="text-[#aaa] text-sm leading-relaxed">{{ comment.content }}</p>
-          </div>
-        </div>
-      {% empty %}
-        <div class="text-center py-10 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg">
-          <p class="text-[#666] text-sm">暂无评论，来坐沙发</p>
-        </div>
-      {% endfor %}
+        {% empty %}
+            <p style="color:var(--soft);font-size:13px;margin-bottom:32px">暂无评论</p>
+        {% endfor %}
 
-      {% if user.is_authenticated %}
-        <form method="post" action="{% url 'post_comments' post.slug %}" class="mt-5 flex gap-3">
-          {% csrf_token %}
-          <span class="w-7 h-7 rounded-full bg-red/20 flex items-center justify-center text-red text-[10px] font-bold shrink-0 mt-2">
-            {{ user.username|slice:":1" }}
-          </span>
-          <div class="flex-1">
-            <textarea name="content" rows="2" placeholder="写下你的想法…"
-                      class="w-full px-4 py-2.5 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-[#ccc] placeholder-[#666] text-sm resize-none focus:outline-none focus:ring-1 focus:ring-red/30 focus:border-red/30 transition"></textarea>
-            <div class="flex justify-end mt-2">
-              <button type="submit" class="px-5 py-1.5 bg-red/10 border border-red/25 text-red rounded-full hover:bg-red/20 transition text-xs font-medium">评论</button>
-            </div>
-          </div>
-        </form>
-      {% else %}
-        <div class="mt-5 p-5 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-center">
-          <p class="text-[#888] text-sm"><a href="{% url 'login' %}" class="text-red hover:text-[#f05a5a] transition">登录</a> 后可以评论</p>
-        </div>
-      {% endif %}
+        {% if user.is_authenticated %}
+            <form method="post" action="{% url 'post_comments' post.slug %}" style="margin-top:48px">
+                {% csrf_token %}
+                <textarea name="content" rows="2" placeholder="写下你的想法" style="resize:none;margin-bottom:16px"></textarea>
+                <button type="submit" class="btn">发表评论</button>
+            </form>
+        {% else %}
+            <p style="color:var(--soft);font-size:13px;margin-top:48px">
+                <a href="{% url 'login' %}">登录</a> 后可以评论
+            </p>
+        {% endif %}
     </section>
-
-  </div>
-
-  <!-- ====== 右侧边栏 ====== -->
-  <aside class="hidden lg:block w-56 shrink-0">
-    <div class="sticky top-20 space-y-5">
-
-      <!-- 作者卡片 -->
-      <div class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-5 text-center">
-        <span class="w-14 h-14 rounded-full bg-red/20 flex items-center justify-center text-red text-lg font-bold mx-auto mb-3">
-          {{ post.author.username|slice:":1" }}
-        </span>
-        <p class="text-sm font-bold text-white mb-1">{{ post.author.username }}</p>
-        <p class="text-[10px] text-[#777] leading-relaxed">作者</p>
-        <div class="mt-3 pt-3 border-t border-[#222] flex justify-around text-center">
-          <div>
-            <p class="text-sm font-bold text-white">{{ post.author.post_set.count }}</p>
-            <p class="text-[10px] text-[#666]">文章</p>
-          </div>
-          <div>
-            <p class="text-sm font-bold text-white">{{ post.likes.count }}</p>
-            <p class="text-[10px] text-[#666]">点赞</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- 同分类文章 -->
-      <div>
-        <p class="text-[10px] text-[#666] uppercase tracking-wider mb-3">同分类文章</p>
-        <div class="space-y-2">
-          {% for related in post.category.post_set.all|slice:":5" %}
-            {% if related.pk != post.pk %}
-            <a href="{% url 'post_detail' related.slug %}"
-               class="block p-3 bg-[#1a1a1a] border border-[#222] rounded-lg hover:border-[#333] hover:bg-[#222] transition group">
-              <p class="text-xs text-[#ccc] group-hover:text-red transition line-clamp-2 leading-relaxed">{{ related.title }}</p>
-              <p class="text-[10px] text-[#666] mt-1.5">{{ related.created_at|date:"m-d" }}</p>
-            </a>
-            {% endif %}
-          {% endfor %}
-        </div>
-      </div>
-    </div>
-  </aside>
 </div>
 {% endblock %}

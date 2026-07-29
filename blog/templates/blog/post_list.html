@@ -2,56 +2,57 @@
 {% block title %}mineblog{% endblock %}
 {% block content %}
 
-<!-- 搜索 -->
-<form method="get" class="mb-10">
-    <div class="flex gap-2 max-w-lg">
-        <input type="text" name="q" value="{{ request.GET.q }}" placeholder="搜索文章…"
-            class="flex-1 px-4 py-2.5 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-[#e0e0e0] placeholder-[#666] text-sm focus:outline-none focus:ring-1 focus:ring-[#ec4141]/30 focus:border-[#ec4141]/40 transition">
-        <button type="submit" class="px-5 py-2.5 text-white rounded-lg text-sm font-medium transition"
-            style="background:var(--accent)">搜索</button>
-    </div>
-    {% if request.GET.q %}
-    <p class="mt-3 meta">搜索「{{ request.GET.q }}」的结果 · <a href="{% url 'post_list' %}" class="link-red">清除</a></p>
-    {% endif %}
+<!-- 搜索 — 一行细线，极低调 -->
+<form method="get" style="margin-bottom: 64px">
+    <input type="search" name="q" value="{{ request.GET.q }}" placeholder="搜索" aria-label="搜索文章"
+           style="max-width: 320px">
 </form>
+{% if request.GET.q %}
+    <p class="label" style="margin-top: -56px; margin-bottom: 64px">
+        搜索「{{ request.GET.q }}」&ensp;·&ensp;<a href="{% url 'post_list' %}">清除</a>
+    </p>
+{% endif %}
 
 <!-- 文章列表 -->
-<div class="space-y-3">
+<div class="narrow">
 {% for post in page_obj %}
-    <article class="card p-5 transition-colors duration-150">
-        <h2 class="mb-1.5">
-            <a href="{% url 'post_detail' post.slug %}" class="link-red" style="font-weight:500;font-size:20px">{{ post.title }}</a>
-            {% if post.status == 'draft' %}<span class="text-xs px-2 py-0.5 rounded-full border border-[#333] meta ml-2">草稿</span>{% endif %}
-        </h2>
-        <p class="meta mb-2">
-            {{ post.author.username }} · {{ post.category.name }} · {{ post.created_at|date:"Y-m-d" }}
+    <article style="margin-bottom: 64px">
+        <p class="label" style="margin-bottom: 12px">
+            {{ post.category.name }}&ensp;·&ensp;{{ post.created_at|date:"Y.m.d" }}
+            {% if post.status == 'draft' %}&ensp;·&ensp;草稿{% endif %}
         </p>
-        <p style="color:var(--text-secondary);line-height:1.6">{{ post.content|truncatechars:180 }}</p>
+        <h2 style="margin-bottom: 8px">
+            <a href="{% url 'post_detail' post.slug %}" style="color:var(--ink);font-size:inherit;font-weight:400">{{ post.title }}</a>
+        </h2>
+        <p style="color:var(--soft);font-size:13px;line-height:1.7">
+            {{ post.content|truncatechars:140 }}
+        </p>
     </article>
 {% empty %}
-    <div class="text-center py-20">
-        <p style="font-size:48px;margin-bottom:16px">🎵</p>
-        <p style="color:var(--text-muted);font-size:15px">还没有文章</p>
+    <div style="padding: 160px 0; text-align: center">
+        <p class="label" style="margin-bottom: 16px">还没有文章</p>
         {% if user.is_authenticated %}
-            <a href="{% url 'post_new' %}" class="link-red mt-3 inline-block">写第一篇</a>
+            <a href="{% url 'post_new' %}">写第一篇</a>
+        {% else %}
+            <a href="{% url 'login' %}">登录后开始写作</a>
         {% endif %}
     </div>
 {% endfor %}
 </div>
 
-<!-- 分页 -->
 {% if page_obj.paginator.num_pages > 1 %}
-<div class="flex justify-center gap-2 mt-10">
+<hr>
+<nav style="display:flex;justify-content:center;gap:24px;font-size:12px;letter-spacing:0.04em">
     {% if page_obj.has_previous %}
-        <a href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="px-3 py-1.5 border border-[#2a2a2a] rounded-md text-sm meta hover:text-white hover:bg-[#252525] transition">首页</a>
-        <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="px-3 py-1.5 border border-[#2a2a2a] rounded-md text-sm meta hover:text-white hover:bg-[#252525] transition">上一页</a>
+        <a href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">首页</a>
+        <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">← 上一页</a>
     {% endif %}
-    <span class="px-3 py-1.5 text-sm meta">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+    <span class="label">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
     {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="px-3 py-1.5 border border-[#2a2a2a] rounded-md text-sm meta hover:text-white hover:bg-[#252525] transition">下一页</a>
-        <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="px-3 py-1.5 border border-[#2a2a2a] rounded-md text-sm meta hover:text-white hover:bg-[#252525] transition">末页</a>
+        <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">下一页 →</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">末页</a>
     {% endif %}
-</div>
+</nav>
 {% endif %}
 
 {% endblock %}

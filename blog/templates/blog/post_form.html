@@ -1,64 +1,79 @@
 {% extends 'base.html' %}
-{% block title %}{% if form.instance.pk %}编辑{% else %}写文章{% endif %} - mineblog{% endblock %}
+{% block title %}{% if form.instance.pk %}编辑{% else %}写文章{% endif %} — mineblog{% endblock %}
 {% block content %}
 
-<div class="max-w-2xl mx-auto card p-8">
-    <h1 class="mb-6">{% if form.instance.pk %}编辑文章{% else %}写文章{% endif %}</h1>
+{% with is_edit=form.instance.pk %}
+<div class="narrow">
 
-    <form method="post" id="post-form" class="space-y-5" novalidate>
+    <p class="label" style="margin-bottom:48px">
+        {% if is_edit %}编辑文章{% else %}新文章{% endif %}
+    </p>
+
+    <form method="post" id="post-form" novalidate>
         {% csrf_token %}
 
-        <div>
-            <label for="id_title" class="block text-sm meta mb-1">标题</label>
+        {% if form.errors %}
+        <div style="color:var(--accent);font-size:12px;margin-bottom:32px;line-height:1.6">
+            {% for field, errors in form.errors.items %}{% for error in errors %}{{ error }}&ensp;{% endfor %}{% endfor %}
+        </div>
+        {% endif %}
+
+        <div style="margin-bottom:32px">
             <input type="text" name="title" id="id_title" value="{{ form.title.value|default:'' }}" required maxlength="200"
-                placeholder="给你的文章起个标题"
-                class="w-full px-4 py-2.5 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-[#e0e0e0] placeholder-[#666] text-sm focus:outline-none focus:ring-1 focus:ring-[#ec4141]/30 focus:border-[#ec4141]/40 transition">
+                   placeholder="标题" style="font-size:20px">
         </div>
 
-        <div>
-            <label for="id_slug" class="block text-sm meta mb-1">URL 别名</label>
+        <div style="margin-bottom:32px">
             <input type="text" name="slug" id="id_slug" value="{{ form.slug.value|default:'' }}" required maxlength="200"
-                placeholder="my-post-slug"
-                class="w-full px-4 py-2.5 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-[#e0e0e0] placeholder-[#666] font-mono text-sm focus:outline-none focus:ring-1 focus:ring-[#ec4141]/30 focus:border-[#ec4141]/40 transition">
+                   placeholder="url-slug" style="font-family:monospace;font-size:13px;color:var(--soft)">
         </div>
 
-        <div>
-            <label for="id_content" class="block text-sm meta mb-1">正文</label>
-            <textarea name="content" id="id_content" required rows="16" placeholder="开始写…"
-                class="w-full px-4 py-4 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-[#ccc] placeholder-[#666] text-sm leading-relaxed resize-y focus:outline-none focus:ring-1 focus:ring-[#ec4141]/30 focus:border-[#ec4141]/40 transition">{{ form.content.value|default:'' }}</textarea>
+        <div style="margin-bottom:48px">
+            <textarea name="content" id="id_content" required rows="20"
+                      placeholder="正文" style="font-size:15px">{{ form.content.value|default:'' }}</textarea>
+            <p class="label" style="text-align:right;margin-top:8px" id="char-count">0 字</p>
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:48px">
             <div>
-                <label for="id_category" class="block text-sm meta mb-1">分类</label>
-                <select name="category" id="id_category" class="w-full px-4 py-2.5 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-[#ccc] text-sm focus:outline-none focus:ring-1 focus:ring-[#ec4141]/30">
+                <p class="label" style="margin-bottom:12px">分类</p>
+                <select name="category" id="id_category">
                     {% for choice in form.category.field.queryset %}
                         <option value="{{ choice.id }}" {% if form.category.value|stringformat:"s" == choice.id|stringformat:"s" %}selected{% endif %}>{{ choice.name }}</option>
                     {% endfor %}
                 </select>
             </div>
             <div>
-                <label class="block text-sm meta mb-1">状态</label>
-                <div class="flex gap-2">
+                <p class="label" style="margin-bottom:12px">状态</p>
+                <div style="display:flex;gap:24px">
                     {% for value, label in form.status.field.choices %}
-                    <label class="flex-1 cursor-pointer">
-                        <input type="radio" name="status" value="{{ value }}" class="peer sr-only"
-                            {% if form.status.value == value %}checked{% elif not form.status.value and value == 'draft' %}checked{% endif %}>
-                        <div class="px-4 py-2.5 text-center rounded-lg border-2 border-[#2a2a2a] text-sm meta transition peer-checked:border-[#ec4141]/30 peer-checked:text-[#e0e0e0]">
-                            {% if value == 'draft' %}📄 草稿{% else %}🚀 发布{% endif %}
-                        </div>
+                    <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--soft);cursor:pointer">
+                        <input type="radio" name="status" value="{{ value }}"
+                               {% if form.status.value == value %}checked{% elif not form.status.value and value == 'draft' %}checked{% endif %}
+                               style="width:auto;accent-color:var(--ink)">
+                        {{ label }}
                     </label>
                     {% endfor %}
                 </div>
             </div>
         </div>
 
-        <div class="flex gap-3 pt-4 border-t border-[#2a2a2a]">
-            <button type="submit" name="action" value="draft" class="px-5 py-2.5 border border-[#2a2a2a] rounded-lg text-sm meta hover:text-white hover:bg-[#252525] transition">存草稿</button>
-            <button type="submit" name="action" value="publish" class="px-6 py-2.5 text-white rounded-lg text-sm font-medium transition" style="background:var(--accent)">发布</button>
-            <a href="{% url 'post_list' %}" class="px-5 py-2.5 border border-[#2a2a2a] rounded-lg text-sm meta ml-auto hover:text-white transition">取消</a>
+        <hr>
+        <div style="display:flex;gap:16px">
+            <button type="submit" name="action" value="draft" class="btn">存草稿</button>
+            <button type="submit" name="action" value="publish" class="btn btn-primary">发布</button>
+            <a href="{% if is_edit %}{% url 'post_detail' form.instance.slug %}{% else %}{% url 'post_list' %}{% endif %}"
+               class="btn" style="margin-left:auto">取消</a>
         </div>
     </form>
 </div>
+{% endwith %}
 
+<script>
+(function(){
+    const c=document.getElementById('id_content'),d=document.getElementById('char-count');
+    function u(){d.textContent=c.value.length.toLocaleString()+' 字'}
+    c.addEventListener('input',u);u();
+})();
+</script>
 {% endblock %}

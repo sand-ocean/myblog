@@ -1,34 +1,36 @@
 {% extends 'base.html' %}
-{% block title %}注册 - mineblog{% endblock %}
+{% block title %}注册 — mineblog{% endblock %}
 {% block content %}
 
-<div class="max-w-sm mx-auto card p-8 mt-16">
-    <h1 class="text-center mb-6">注册</h1>
-    <form method="post" class="space-y-4" novalidate>
-        {% csrf_token %}
-        <div>
-            <label for="id_username" class="block text-sm meta mb-1">用户名</label>
-            <input type="text" name="username" id="id_username" required autofocus
-                class="w-full px-4 py-2.5 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-[#e0e0e0] placeholder-[#666] text-sm focus:outline-none focus:ring-1 focus:ring-[#ec4141]/30 transition">
-        </div>
-        <div>
-            <label for="id_password1" class="block text-sm meta mb-1">密码</label>
-            <input type="password" name="password1" id="id_password1" required
-                class="w-full px-4 py-2.5 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-[#e0e0e0] placeholder-[#666] text-sm focus:outline-none focus:ring-1 focus:ring-[#ec4141]/30 transition">
-        </div>
-        <div>
-            <label for="id_password2" class="block text-sm meta mb-1">确认密码</label>
-            <input type="password" name="password2" id="id_password2" required
-                class="w-full px-4 py-2.5 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-[#e0e0e0] placeholder-[#666] text-sm focus:outline-none focus:ring-1 focus:ring-[#ec4141]/30 transition">
-        </div>
-        {% if form.errors %}
-        <div class="p-3 rounded-lg text-sm" style="background:rgba(236,65,65,0.08);color:var(--accent)">
-            {% for field, errors in form.errors.items %}{% for error in errors %}{{ error }}{% endfor %}{% endfor %}
-        </div>
-        {% endif %}
-        <button type="submit" class="w-full py-2.5 text-white rounded-lg text-sm font-medium transition" style="background:var(--accent)">注册</button>
-    </form>
-    <p class="text-center meta mt-4">已有账号？<a href="{% url 'login' %}" class="link-red">登录</a></p>
-</div>
+<div class="narrow" style="padding-top:64px">
+    <p class="label" style="margin-bottom:48px">注册</p>
 
+    {% if form.errors %}
+    <p style="color:var(--accent);font-size:12px;margin-bottom:32px;line-height:1.6">
+        {% for field, errors in form.errors.items %}{% for error in errors %}{{ error }}&ensp;{% endfor %}{% endfor %}
+    </p>
+    {% endif %}
+
+    <form method="post" style="max-width:360px" novalidate>
+        {% csrf_token %}
+        <div style="margin-bottom:24px">
+            <input type="text" name="username" id="id_username" required autofocus
+                   placeholder="用户名" autocomplete="username">
+        </div>
+        <div style="margin-bottom:24px">
+            <input type="password" name="password1" id="id_password1" required
+                   placeholder="密码" autocomplete="new-password">
+        </div>
+        <div style="margin-bottom:32px">
+            <input type="password" name="password2" id="id_password2" required
+                   placeholder="确认密码" autocomplete="new-password">
+        </div>
+        <p class="label" style="margin-bottom:32px;line-height:1.6">至少 8 个字符，不能是常见密码或纯数字</p>
+        <button type="submit" class="btn btn-primary" style="width:100%">创建账号</button>
+    </form>
+
+    <p style="color:var(--soft);font-size:13px;margin-top:32px">
+        已有账号？<a href="{% url 'login' %}">登录</a>
+    </p>
+</div>
 {% endblock %}
