@@ -43,9 +43,11 @@
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
                 <button type="button" id="upload-image-btn" class="btn" style="font-size:11px;padding:4px 12px">📷 插入图片</button>
                 <span style="font-size:10px;color:var(--soft)">上传到 Cloudinary</span>
+                <button type="button" id="preview-toggle" class="btn" style="font-size:11px;padding:4px 12px;margin-left:auto">👁 预览</button>
             </div>
             <textarea name="content" id="id_content" required rows="20"
                       placeholder="正文（图片按钮在左上角）" style="font-size:15px">{{ form.content.value|default:'' }}</textarea>
+            <div id="preview-panel" style="display:none;min-height:400px;padding:24px;background:var(--surface);border:1px solid var(--hairline);border-radius:8px;font-size:15px;line-height:2;margin-top:16px"></div>
             <p class="label" style="text-align:right;margin-top:8px" id="char-count">0 字</p>
         </div>
 
@@ -121,6 +123,33 @@
 
     document.getElementById('upload-image-btn').addEventListener('click', function(){
         widget.open();
+    });
+})();
+</script>
+
+<!-- Markdown 实时预览 -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+(function(){
+    var ta = document.getElementById('id_content');
+    var btn = document.getElementById('preview-toggle');
+    var panel = document.getElementById('preview-panel');
+    var previewing = false;
+    btn.addEventListener('click', function(){
+        previewing = !previewing;
+        if (previewing) {
+            panel.innerHTML = marked.parse(ta.value || '*暂无内容*');
+            panel.style.display = 'block';
+            ta.style.display = 'none';
+            btn.textContent = '✏ 编辑';
+        } else {
+            panel.style.display = 'none';
+            ta.style.display = '';
+            btn.textContent = '👁 预览';
+        }
+    });
+    ta.addEventListener('input', function(){
+        if (previewing) panel.innerHTML = marked.parse(ta.value || '*暂无内容*');
     });
 })();
 </script>
