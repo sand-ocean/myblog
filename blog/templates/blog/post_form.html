@@ -5,9 +5,20 @@
 {% with is_edit=form.instance.pk %}
 <div class="narrow">
 
-    <p class="label" style="margin-bottom:48px">
+    <p class="label" style="margin-bottom:12px">
         {% if is_edit %}编辑文章{% else %}新文章{% endif %}
     </p>
+
+    {% if imported_filename %}
+    <p style="font-size:12px;margin-bottom:24px;color:var(--soft)">
+        📄 从 <em>{{ imported_filename }}</em> 导入&ensp;
+        <a href="{% url 'import_post' %}">重新导入</a>
+    </p>
+    {% elif not is_edit %}
+    <p style="font-size:12px;margin-bottom:32px">
+        <a href="{% url 'import_post' %}" style="color:var(--soft)">📎 从文件导入（PDF/Word/PPT → 自动转正文）</a>
+    </p>
+    {% endif %}
 
     <form method="post" id="post-form" novalidate>
         {% csrf_token %}

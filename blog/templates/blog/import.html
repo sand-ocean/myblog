@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}导入文件 — mineblog{% endblock %}
+{% block content %}
+
+<div class="narrow" style="padding-top:64px">
+    <p class="label" style="margin-bottom:16px">从文件导入</p>
+    <h1 style="margin-bottom:8px">上传文件转文章</h1>
+    <p style="color:var(--soft);font-size:13px;margin-bottom:48px;line-height:1.7">
+        支持 PDF · Word · PPT · Excel · HTML · CSV · JSON · XML 等格式。<br>
+        文件内容会自动转为正文，你只需加上标题和分类即可发布。
+    </p>
+
+    {% if error %}
+    <p style="color:var(--accent);font-size:12px;margin-bottom:32px;line-height:1.6">{{ error }}</p>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" style="max-width:400px">
+        {% csrf_token %}
+        <div style="margin-bottom:32px">
+            <input type="file" name="file" required
+                   accept=".pdf,.docx,.pptx,.xlsx,.html,.csv,.json,.xml,.txt,.md"
+                   style="border:none;padding:12px 0;font-size:14px">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%">转换并开始编辑</button>
+    </form>
+
+    <p style="color:var(--soft);font-size:13px;margin-top:32px">
+        <a href="{% url 'post_new' %}">跳过，直接写文章</a>
+    </p>
+</div>
+
+{% endblock %}

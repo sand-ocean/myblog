@@ -68,10 +68,20 @@ def post_new(request):
             post.author = request.user         # 补上作者
             post.status = 'published' if request.POST.get('action') == 'publish' else 'draft'
             post.save()                        # 现在写入
+            request.session.pop('imported_content', None)
+            request.session.pop('imported_filename', None)
             return redirect('post_list')
     else:
-        form = PostForm()
-    return render(request, 'blog/post_form.html', {'form': form})
+        # 从文件导入预填内容
+        initial = {}
+        imported = request.session.get('imported_content')
+        if imported:
+            initial['content'] = imported
+        form = PostForm(initial=initial)
+    return render(request, 'blog/post_form.html', {
+        'form': form,
+        'imported_filename': request.session.get('imported_filename', ''),
+    })
 
 
 # ── 编辑文章（需登录，只能改自己的）──────────────────
@@ -155,6 +165,31 @@ def like_post(request, slug):
     else:
         post.likes.add(request.user)      # 点赞
     return redirect('post_detail', slug=slug)
+
+
+# ── 文件导入（markitdown：PDF/Word/PPT → Markdown）──
+@login_required
+def import_post(request):
+    """GET=上传页面  POST=转换文件 → 跳转写文章页"""
+    if request.method == 'POST' and request.FILES.get('file'):
+        try:
+            from markitdown import MarkItDown
+            import tempfile, os
+            md = MarkItDown()
+            uploaded = request.FILES['file']
+            suffix = os.path.splitext(uploaded.name)[1]
+            with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+                for chunk in uploaded.chunks():
+                    tmp.write(chunk)
+                tmp_path = tmp.name
+            result = md.convert(tmp_path)
+            os.unlink(tmp_path)
+            request.session['imported_content'] = result.text_content.strip()
+            request.session['imported_filename'] = uploaded.name
+            return redirect('post_new')
+        except Exception as e:
+            return render(request, 'blog/import.html', {'error': str(e)})
+    return render(request, 'blog/import.html')
 
 
 # ── setup_admin 已迁移到管理命令 ──

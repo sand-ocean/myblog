@@ -14,6 +14,7 @@ urlpatterns = [
     path('post/<slug:slug>/comment/', views.post_comments, name='post_comments'),
     path('post/<slug:slug>/like/', views.like_post, name='like_post'),
     path('category/<slug:slug>/', views.category_posts, name='category_posts'),
+    path('import/', views.import_post, name='import_post'),
 
     # ── JSON API 路由（Apipost / Postman 用）──────
     # 注意：API 路由都以 api/ 开头，和上面的 HTML 路由不冲突
