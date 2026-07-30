@@ -192,7 +192,25 @@ def import_post(request):
     return render(request, 'blog/import.html')
 
 
-# ── setup_admin 已迁移到管理命令 ──
-# 部署后运行：python manage.py setup_admin
+# ── 初始化分类──
+def setup_init(request):
+    """访问此页面：建管理员 + 默认分类 + 清旧分类"""
+    from django.contrib.auth.models import User
+    from django.http import HttpResponse
+    msg = []
+
+    # 跳过删除（避免级联删除文章），旧分类自己到 admin 手动删
+
+    # 建管理员
+    if not User.objects.filter(username='admin').exists():
+        User.objects.create_superuser('admin', 'admin@example.com', 'admin123')
+        msg.append('管理员 admin/admin123 已创建')
+
+    # 建新分类
+    for s, n in [('diary', '日记'), ('reading', '阅读'), ('essay', '随笔'), ('photo', '摄影')]:
+        c, created = Category.objects.get_or_create(slug=s, defaults={'name': n})
+        msg.append(f'分类 {n} {"已创建" if created else "已存在"}')
+
+    return HttpResponse('<br>'.join(msg) + '<br><br><a href="/">去首页</a>')
 
 
