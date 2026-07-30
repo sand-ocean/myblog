@@ -22,11 +22,18 @@ class Command(BaseCommand):
             User.objects.create_superuser('admin', 'admin@example.com', 'admin123')
             self.stdout.write(self.style.SUCCESS('✓ 管理员创建成功：admin / admin123'))
 
-        # 2. 建默认分类
+        # 2. 清理旧分类
+        old_slugs = ['python', 'django', 'life']
+        for slug in old_slugs:
+            Category.objects.filter(slug=slug).delete()
+        self.stdout.write('  旧分类（Python/Django/生活随笔）已清理')
+
+        # 3. 建新分类
         defaults = [
-            ('python', 'Python'),
-            ('django', 'Django'),
-            ('life', '生活随笔'),
+            ('diary', '日记'),
+            ('reading', '阅读'),
+            ('essay', '随笔'),
+            ('photo', '摄影'),
         ]
         for slug, name in defaults:
             obj, created = Category.objects.get_or_create(
