@@ -98,6 +98,55 @@
 <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
 <script>
 (function(){
+    var images = []; // {url, alt}
+
+    function renderStrip() {
+        var strip = document.getElementById('image-strip');
+        strip.innerHTML = '';
+        images.forEach(function(item, i){
+            var wrap = document.createElement('div');
+            wrap.style.cssText = 'position:relative;width:100px;height:100px;border-radius:4px;overflow:hidden;border:1px solid var(--hairline);cursor:pointer';
+            var img = document.createElement('img');
+            img.src = item.url;
+            img.alt = item.alt;
+            img.title = '点击预览';
+            img.style.cssText = 'width:100%;height:100%;object-fit:cover';
+            img.onclick = function(){
+                // 本页 lightbox
+                var lb = document.createElement('div');
+                lb.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:9999;cursor:pointer';
+                var lbImg = document.createElement('img');
+                lbImg.src = item.url;
+                lbImg.style.cssText = 'max-width:90vw;max-height:90vh;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);object-fit:contain;pointer-events:none';
+                lb.appendChild(lbImg);
+                lb.onclick = function(){ lb.remove(); };
+                document.body.appendChild(lb);
+            };
+            var del = document.createElement('span');
+            del.textContent = '×';
+            del.title = '删除';
+            del.style.cssText = 'position:absolute;top:2px;right:4px;color:white;font-size:14px;cursor:pointer;text-shadow:0 0 4px black;z-index:2';
+            del.onclick = function(e){ e.stopPropagation(); images.splice(i,1); renderStrip(); };
+            wrap.appendChild(img);
+            wrap.appendChild(del);
+            strip.appendChild(wrap);
+        });
+    }
+
+    // 编辑时从正文解析已有图片
+    var ta = document.getElementById('id_content');
+    var cleanContent = ta.value;
+    var found = cleanContent.match(/!\[([^\]]*)\]\(([^)]+)\)/g);
+    if (found) {
+        found.forEach(function(m){
+            var m2 = m.match(/!\[([^\]]*)\]\(([^)]+)\)/);
+            if (m2) images.push({url: m2[2], alt: m2[1] || 'image'});
+        });
+        cleanContent = cleanContent.replace(/!\[[^\]]*\]\([^)]+\)\n?/g, '');
+        ta.value = cleanContent.trim();
+        renderStrip();
+    }
+
     var widget = cloudinary.createUploadWidget({
         cloudName: 'tm0rl5co',
         uploadPreset: 'myblog_upload',
@@ -107,51 +156,24 @@
         maxFileSize: 10000000,
     }, function(error, result) {
         if (!error && result && result.event === 'success') {
-            var url = result.info.secure_url;
-            var alt = result.info.original_filename || 'image';
-            var md = '![' + alt + '](' + url + ')';
-            var ta = document.getElementById('id_content');
-            // 插入 markdown 到正文
-            ta.value = ta.value + md + '\n';
-            ta.dispatchEvent(new Event('input', {bubbles: true}));
-            // 显示缩略图
-            addThumb(url, alt);
+            images.push({
+                url: result.info.secure_url,
+                alt: result.info.original_filename || 'image'
+            });
+            renderStrip();
         }
     });
 
-    function addThumb(url, alt) {
-        var strip = document.getElementById('image-strip');
-        var wrap = document.createElement('div');
-        wrap.style.cssText = 'position:relative;width:100px;height:100px;border-radius:4px;overflow:hidden;border:1px solid var(--hairline)';
-        var img = document.createElement('img');
-        img.src = url;
-        img.alt = alt;
-        img.style.cssText = 'width:100%;height:100%;object-fit:cover';
-        var del = document.createElement('span');
-        del.textContent = '×';
-        del.style.cssText = 'position:absolute;top:2px;right:4px;color:white;font-size:14px;cursor:pointer;text-shadow:0 0 4px black';
-        del.onclick = function(){
-            var md = '![' + alt + '](' + url + ')';
-            var ta = document.getElementById('id_content');
-            ta.value = ta.value.replace(md, '');
-            ta.dispatchEvent(new Event('input', {bubbles: true}));
-            wrap.remove();
-        };
-        wrap.appendChild(img);
-        wrap.appendChild(del);
-        strip.appendChild(wrap);
-    }
+    document.getElementById('upload-image-btn').addEventListener('click', function(){ widget.open(); });
 
-    // 编辑时从正文解析已有图片
-    var ta = document.getElementById('id_content');
-    var imgs = ta.value.match(/!\[([^\]]*)\]\(([^)]+)\)/g);
-    if (imgs) imgs.forEach(function(m){
-        var m2 = m.match(/!\[([^\]]*)\]\(([^)]+)\)/);
-        if (m2) addThumb(m2[2], m2[1] || 'image');
-    });
-
-    document.getElementById('upload-image-btn').addEventListener('click', function(){
-        widget.open();
+    // 提交前：把图片 markdown 合成到正文末尾
+    var form = document.getElementById('post-form');
+    form.addEventListener('submit', function(){
+        if (images.length > 0) {
+            var md = images.map(function(i){ return '![' + i.alt + '](' + i.url + ')'; }).join('\n');
+            var v = ta.value.trim();
+            ta.value = (v ? v + '\n\n' : '') + md;
+        }
     });
 })();
 </script>
