@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load markdown_filter %}
 {% block title %}mineblog{% endblock %}
 {% block content %}
 
@@ -25,7 +26,7 @@
             <a href="{% url 'post_detail' post.slug %}" style="color:var(--ink);font-size:inherit;font-weight:400">{{ post.title }}</a>
         </h2>
         <p style="color:var(--soft);font-size:13px;line-height:1.7">
-            {{ post.content|truncatechars:140 }}
+            {{ post.content|plain|truncatechars:140 }}
         </p>
     </article>
 {% empty %}
