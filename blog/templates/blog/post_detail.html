@@ -102,4 +102,17 @@
     update();
 })();
 </script>
+
+<!-- 图片点击放大 -->
+<div id="lightbox" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:9999;cursor:pointer" onclick="this.style.display=\"none\""><img id="lightbox-img" style="max-width:90vw;max-height:90vh;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);object-fit:contain" src=""></div>
+<script>
+(function(){
+    var lb=document.getElementById("lightbox");
+    var img=document.getElementById("lightbox-img");
+    document.querySelectorAll("#article-body img").forEach(function(el){
+        el.style.cursor="zoom-in";
+        el.addEventListener("click",function(e){e.preventDefault();img.src=this.src;lb.style.display="block";});
+    });
+})();
+</script>
 {% endblock %}

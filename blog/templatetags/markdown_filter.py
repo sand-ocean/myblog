@@ -14,12 +14,6 @@ def markdown_filter(value):
         value,
         extensions=['fenced_code', 'tables', 'nl2br'],
     )
-    # 把图片包进可点击的链接
-    html = re.sub(
-        r'<img src="([^"]+)" alt="([^"]*)"',
-        r'<a href="\1" target="_blank"><img src="\1" alt="\2" style="cursor:zoom-in"',
-        html
-    )
     return mark_safe(html)
 
 
