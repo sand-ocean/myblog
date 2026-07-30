@@ -40,14 +40,14 @@
         </div>
 
         <div style="margin-bottom:48px">
+            <!-- 图片缩略图区 -->
+            <div id="image-strip" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px"></div>
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-                <button type="button" id="upload-image-btn" class="btn" style="font-size:11px;padding:4px 12px">📷 插入图片</button>
-                <span style="font-size:10px;color:var(--soft)">上传到 Cloudinary</span>
-                <button type="button" id="preview-toggle" class="btn" style="font-size:11px;padding:4px 12px;margin-left:auto">👁 预览</button>
+                <button type="button" id="upload-image-btn" class="btn" style="font-size:11px;padding:4px 12px">📷 上传图片</button>
+                <span style="font-size:10px;color:var(--soft)">直接在下方预览</span>
             </div>
-            <textarea name="content" id="id_content" required rows="20"
-                      placeholder="正文（图片按钮在左上角）" style="font-size:15px">{{ form.content.value|default:'' }}</textarea>
-            <div id="preview-panel" style="display:none;min-height:400px;padding:24px;background:var(--surface);border:1px solid var(--hairline);border-radius:8px;font-size:15px;line-height:2;margin-top:16px"></div>
+            <textarea name="content" id="id_content" required rows="16"
+                      placeholder="正文" style="font-size:15px">{{ form.content.value|default:'' }}</textarea>
             <p class="label" style="text-align:right;margin-top:8px" id="char-count">0 字</p>
         </div>
 
@@ -101,7 +101,7 @@
     var widget = cloudinary.createUploadWidget({
         cloudName: 'tm0rl5co',
         uploadPreset: 'myblog_upload',
-        sources: ['local', 'url', 'camera'],
+        sources: ['local', 'url'],
         multiple: false,
         clientAllowedFormats: ['png', 'jpg', 'jpeg', 'gif', 'webp'],
         maxFileSize: 10000000,
@@ -111,45 +111,47 @@
             var alt = result.info.original_filename || 'image';
             var md = '![' + alt + '](' + url + ')';
             var ta = document.getElementById('id_content');
-            var start = ta.selectionStart;
-            var end = ta.selectionEnd;
-            ta.value = ta.value.substring(0, start) + md + '\n' + ta.value.substring(end);
-            ta.focus();
-            ta.selectionStart = ta.selectionEnd = start + md.length + 1;
-            var e = new Event('input', {bubbles: true});
-            ta.dispatchEvent(e);
+            // 插入 markdown 到正文
+            ta.value = ta.value + md + '\n';
+            ta.dispatchEvent(new Event('input', {bubbles: true}));
+            // 显示缩略图
+            addThumb(url, alt);
         }
+    });
+
+    function addThumb(url, alt) {
+        var strip = document.getElementById('image-strip');
+        var wrap = document.createElement('div');
+        wrap.style.cssText = 'position:relative;width:100px;height:100px;border-radius:4px;overflow:hidden;border:1px solid var(--hairline)';
+        var img = document.createElement('img');
+        img.src = url;
+        img.alt = alt;
+        img.style.cssText = 'width:100%;height:100%;object-fit:cover';
+        var del = document.createElement('span');
+        del.textContent = '×';
+        del.style.cssText = 'position:absolute;top:2px;right:4px;color:white;font-size:14px;cursor:pointer;text-shadow:0 0 4px black';
+        del.onclick = function(){
+            var md = '![' + alt + '](' + url + ')';
+            var ta = document.getElementById('id_content');
+            ta.value = ta.value.replace(md, '');
+            ta.dispatchEvent(new Event('input', {bubbles: true}));
+            wrap.remove();
+        };
+        wrap.appendChild(img);
+        wrap.appendChild(del);
+        strip.appendChild(wrap);
+    }
+
+    // 编辑时从正文解析已有图片
+    var ta = document.getElementById('id_content');
+    var imgs = ta.value.match(/!\[([^\]]*)\]\(([^)]+)\)/g);
+    if (imgs) imgs.forEach(function(m){
+        var m2 = m.match(/!\[([^\]]*)\]\(([^)]+)\)/);
+        if (m2) addThumb(m2[2], m2[1] || 'image');
     });
 
     document.getElementById('upload-image-btn').addEventListener('click', function(){
         widget.open();
-    });
-})();
-</script>
-
-<!-- Markdown 实时预览 -->
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<script>
-(function(){
-    var ta = document.getElementById('id_content');
-    var btn = document.getElementById('preview-toggle');
-    var panel = document.getElementById('preview-panel');
-    var previewing = false;
-    btn.addEventListener('click', function(){
-        previewing = !previewing;
-        if (previewing) {
-            panel.innerHTML = marked.parse(ta.value || '*暂无内容*');
-            panel.style.display = 'block';
-            ta.style.display = 'none';
-            btn.textContent = '✏ 编辑';
-        } else {
-            panel.style.display = 'none';
-            ta.style.display = '';
-            btn.textContent = '👁 预览';
-        }
-    });
-    ta.addEventListener('input', function(){
-        if (previewing) panel.innerHTML = marked.parse(ta.value || '*暂无内容*');
     });
 })();
 </script>
