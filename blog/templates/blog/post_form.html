@@ -40,8 +40,12 @@
         </div>
 
         <div style="margin-bottom:48px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+                <button type="button" id="upload-image-btn" class="btn" style="font-size:11px;padding:4px 12px">📷 插入图片</button>
+                <span style="font-size:10px;color:var(--soft)">上传到 Cloudinary</span>
+            </div>
             <textarea name="content" id="id_content" required rows="20"
-                      placeholder="正文" style="font-size:15px">{{ form.content.value|default:'' }}</textarea>
+                      placeholder="正文（图片按钮在左上角）" style="font-size:15px">{{ form.content.value|default:'' }}</textarea>
             <p class="label" style="text-align:right;margin-top:8px" id="char-count">0 字</p>
         </div>
 
@@ -85,6 +89,39 @@
     const c=document.getElementById('id_content'),d=document.getElementById('char-count');
     function u(){d.textContent=c.value.length.toLocaleString()+' 字'}
     c.addEventListener('input',u);u();
+})();
+</script>
+
+<!-- Cloudinary Upload Widget -->
+<script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
+<script>
+(function(){
+    var widget = cloudinary.createUploadWidget({
+        cloudName: 'tm0rl5co',
+        uploadPreset: 'myblog_upload',
+        sources: ['local', 'url', 'camera'],
+        multiple: false,
+        clientAllowedFormats: ['png', 'jpg', 'jpeg', 'gif', 'webp'],
+        maxFileSize: 10000000,
+    }, function(error, result) {
+        if (!error && result && result.event === 'success') {
+            var url = result.info.secure_url;
+            var alt = result.info.original_filename || 'image';
+            var md = '![' + alt + '](' + url + ')';
+            var ta = document.getElementById('id_content');
+            var start = ta.selectionStart;
+            var end = ta.selectionEnd;
+            ta.value = ta.value.substring(0, start) + md + '\n' + ta.value.substring(end);
+            ta.focus();
+            ta.selectionStart = ta.selectionEnd = start + md.length + 1;
+            var e = new Event('input', {bubbles: true});
+            ta.dispatchEvent(e);
+        }
+    });
+
+    document.getElementById('upload-image-btn').addEventListener('click', function(){
+        widget.open();
+    });
 })();
 </script>
 {% endblock %}
