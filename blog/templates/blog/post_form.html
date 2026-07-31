@@ -40,12 +40,18 @@
         </div>
 
         <div style="margin-bottom:48px">
-            <!-- 图片缩略图区 -->
-            <div id="image-strip" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px"></div>
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-                <button type="button" id="upload-image-btn" class="btn" style="font-size:11px;padding:4px 12px">📷 上传图片</button>
-                <span style="font-size:10px;color:var(--soft)">直接在下方预览</span>
+            <!-- 格式化工具栏 -->
+            <div style="display:flex;gap:4px;margin-bottom:10px;flex-wrap:wrap" id="format-bar">
+                <button type="button" data-action="bold" title="加粗 (Ctrl+B)" class="fmt-btn"><b>B</b></button>
+                <button type="button" data-action="italic" title="斜体 (Ctrl+I)" class="fmt-btn"><i>I</i></button>
+                <button type="button" data-action="heading" title="标题" class="fmt-btn">H</button>
+                <button type="button" data-action="quote" title="引用" class="fmt-btn">»</button>
+                <button type="button" data-action="link" title="链接" class="fmt-btn">🔗</button>
+                <span style="color:var(--hairline);margin:0 4px">│</span>
+                <button type="button" id="upload-image-btn" class="fmt-btn" title="上传图片到光标位置">📷 图片</button>
             </div>
+            <!-- 图片缩略图区 -->
+            <div id="image-strip" style="display:none;flex-wrap:wrap;gap:6px;margin-bottom:10px"></div>
             <textarea name="content" id="id_content" required rows="16"
                       placeholder="正文" style="font-size:15px">{{ form.content.value|default:'' }}</textarea>
             <p class="label" style="text-align:right;margin-top:8px" id="char-count">0 字</p>
@@ -94,25 +100,82 @@
 })();
 </script>
 
+<style>
+.fmt-btn {
+    background: none; border: 1px solid var(--hairline); border-radius: 3px;
+    padding: 2px 8px; font-size: 12px; color: var(--soft); cursor: pointer;
+    font-family: inherit; line-height: 1.6; transition: all .15s;
+}
+.fmt-btn:hover { color: var(--ink); border-color: var(--ink); }
+</style>
+
 <!-- Cloudinary Upload Widget -->
 <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
 <script>
 (function(){
     var images = []; // {url, alt}
+    var ta = document.getElementById('id_content');
 
+    // ── 在光标处插入文字，并触发 input 事件 ──
+    function insertAtCursor(text) {
+        var start = ta.selectionStart, end = ta.selectionEnd;
+        var before = ta.value.substring(0, start);
+        var after = ta.value.substring(end);
+        // 智能换行：不在开头时前面补换行
+        var prefix = (start === 0 || before.endsWith('\n')) ? '' : '\n';
+        var suffix = after.startsWith('\n') || after === '' ? '' : '\n';
+        ta.value = before + prefix + text + suffix + after;
+        var pos = start + prefix.length + text.length + suffix.length;
+        ta.setSelectionRange(pos, pos);
+        ta.focus();
+        ta.dispatchEvent(new Event('input', {bubbles: true}));
+    }
+
+    // ── 包裹选中文字 ──
+    function wrapSelection(left, right, placeholder) {
+        var start = ta.selectionStart, end = ta.selectionEnd;
+        var sel = ta.value.substring(start, end) || placeholder;
+        ta.value = ta.value.substring(0, start) + left + sel + right + ta.value.substring(end);
+        var pos = start + left.length + sel.length + right.length;
+        ta.setSelectionRange(start + left.length, start + left.length + sel.length);
+        ta.focus();
+        ta.dispatchEvent(new Event('input', {bubbles: true}));
+    }
+
+    // ── 格式化工具栏 ──
+    document.getElementById('format-bar').addEventListener('click', function(e){
+        var btn = e.target.closest('.fmt-btn');
+        if (!btn || btn.id === 'upload-image-btn') return;
+        e.preventDefault();
+        var action = btn.dataset.action;
+        if (action === 'bold') wrapSelection('**', '**', '加粗文字');
+        else if (action === 'italic') wrapSelection('*', '*', '斜体文字');
+        else if (action === 'heading') insertAtCursor('## 小标题');
+        else if (action === 'quote') insertAtCursor('> 引用文字');
+        else if (action === 'link') wrapSelection('[', '](url)', '链接文字');
+    });
+
+    // ── 快捷键 Ctrl+B / Ctrl+I ──
+    ta.addEventListener('keydown', function(e){
+        if ((e.ctrlKey || e.metaKey) && e.key === 'b') { e.preventDefault(); wrapSelection('**', '**', '加粗'); }
+        if ((e.ctrlKey || e.metaKey) && e.key === 'i') { e.preventDefault(); wrapSelection('*', '*', '斜体'); }
+    });
+
+    // ── 渲染缩略图条 ──
     function renderStrip() {
         var strip = document.getElementById('image-strip');
         strip.innerHTML = '';
+        if (images.length === 0) { strip.style.display = 'none'; return; }
+        strip.style.display = 'flex';
         images.forEach(function(item, i){
             var wrap = document.createElement('div');
-            wrap.style.cssText = 'position:relative;width:100px;height:100px;border-radius:4px;overflow:hidden;border:1px solid var(--hairline);cursor:pointer';
+            wrap.style.cssText = 'position:relative;width:72px;height:72px;border-radius:3px;overflow:hidden;border:1px solid var(--hairline);flex-shrink:0;cursor:pointer';
+
             var img = document.createElement('img');
-            img.src = item.url;
-            img.alt = item.alt;
-            img.title = '点击预览';
+            img.src = item.url; img.alt = item.alt;
+            img.title = '点击预览大图';
             img.style.cssText = 'width:100%;height:100%;object-fit:cover';
             img.onclick = function(){
-                // 本页 lightbox
                 var lb = document.createElement('div');
                 lb.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:9999;cursor:pointer';
                 var lbImg = document.createElement('img');
@@ -122,31 +185,39 @@
                 lb.onclick = function(){ lb.remove(); };
                 document.body.appendChild(lb);
             };
+
+            // 插入按钮
+            var ins = document.createElement('span');
+            ins.textContent = '↩';
+            ins.title = '插入到光标位置';
+            ins.style.cssText = 'position:absolute;bottom:1px;left:3px;color:#fff;font-size:10px;cursor:pointer;text-shadow:0 0 3px #000;z-index:2;background:rgba(0,0,0,.35);border-radius:2px;padding:0 4px;line-height:1.6';
+            ins.onclick = function(e){ e.stopPropagation(); insertAtCursor('![' + item.alt + '](' + item.url + ')'); };
+
+            // 删除按钮
             var del = document.createElement('span');
-            del.textContent = '×';
-            del.title = '删除';
-            del.style.cssText = 'position:absolute;top:2px;right:4px;color:white;font-size:14px;cursor:pointer;text-shadow:0 0 4px black;z-index:2';
+            del.textContent = '×'; del.title = '移出列表';
+            del.style.cssText = 'position:absolute;top:1px;right:3px;color:#fff;font-size:13px;cursor:pointer;text-shadow:0 0 4px #000;z-index:2';
             del.onclick = function(e){ e.stopPropagation(); images.splice(i,1); renderStrip(); };
+
             wrap.appendChild(img);
+            wrap.appendChild(ins);
             wrap.appendChild(del);
             strip.appendChild(wrap);
         });
     }
 
-    // 编辑时从正文解析已有图片
-    var ta = document.getElementById('id_content');
-    var cleanContent = ta.value;
-    var found = cleanContent.match(/!\[([^\]]*)\]\(([^)]+)\)/g);
+    // ── 编辑模式：从正文解析已插入的图片 ──
+    var found = ta.value.match(/!\[([^\]]*)\]\(([^)]+)\)/g);
     if (found) {
         found.forEach(function(m){
             var m2 = m.match(/!\[([^\]]*)\]\(([^)]+)\)/);
             if (m2) images.push({url: m2[2], alt: m2[1] || 'image'});
         });
-        cleanContent = cleanContent.replace(/!\[[^\]]*\]\([^)]+\)\n?/g, '');
-        ta.value = cleanContent.trim();
+        // ← 关键：不再从正文删除，图片留在原位实现混排
         renderStrip();
     }
 
+    // ── Cloudinary 上传 ──
     var widget = cloudinary.createUploadWidget({
         cloudName: 'tm0rl5co',
         uploadPreset: 'myblog_upload',
@@ -156,23 +227,27 @@
         maxFileSize: 10000000,
     }, function(error, result) {
         if (!error && result && result.event === 'success') {
-            images.push({
-                url: result.info.secure_url,
-                alt: result.info.original_filename || 'image'
-            });
+            var item = {url: result.info.secure_url, alt: result.info.original_filename || 'image'};
+            images.push(item);
             renderStrip();
+            insertAtCursor('![' + item.alt + '](' + item.url + ')');  // ★ 插入到光标处
         }
     });
 
     document.getElementById('upload-image-btn').addEventListener('click', function(){ widget.open(); });
 
-    // 提交前：把图片 markdown 合成到正文末尾
+    // ── 提交前：正文里没有的图片补到末尾 ──
     var form = document.getElementById('post-form');
     form.addEventListener('submit', function(){
-        if (images.length > 0) {
-            var md = images.map(function(i){ return '![' + i.alt + '](' + i.url + ')'; }).join('\n');
-            var v = ta.value.trim();
-            ta.value = (v ? v + '\n\n' : '') + md;
+        var content = ta.value;
+        var tail = [];
+        images.forEach(function(item){
+            if (content.indexOf(item.url) === -1) {
+                tail.push('![' + item.alt + '](' + item.url + ')');
+            }
+        });
+        if (tail.length > 0) {
+            ta.value = content.trim() + '\n\n' + tail.join('\n');
         }
     });
 })();
