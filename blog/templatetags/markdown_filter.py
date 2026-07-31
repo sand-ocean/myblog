@@ -31,3 +31,10 @@ def plain_filter(value):
     # 去掉行内代码
     text = re.sub(r'`([^`]+)`', r'\1', text)
     return text.strip()
+
+
+@register.filter(name='first_image')
+def first_image_filter(value):
+    """{{ post.content|first_image }} → 正文里第一张图片的 URL，没有则返回空字符串"""
+    m = re.search(r'!\[.*?\]\((.*?)\)', value)
+    return m.group(1) if m else ''

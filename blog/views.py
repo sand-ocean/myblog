@@ -35,7 +35,7 @@ def post_list(request):
         posts = posts.filter(
             Q(title__icontains=query) | Q(content__icontains=query)
         )
-    paginator = Paginator(posts, 5)  # 每页5篇
+    paginator = Paginator(posts, 6)  # 每页6篇（2列×3行）
     page_number = request.GET.get('page', 1)  # 当前第几页，默认1
     page_obj = paginator.get_page(page_number)
     return render(request, 'blog/post_list.html', {'page_obj': page_obj})
