@@ -278,12 +278,11 @@ def api_like_post(request, slug):
     这叫"Toggle 模式"（开关模式）——同一个接口，点一下开，再点一下关。
     """
 
-    post = get_object_or_404(Post, slug=slug)
+    # ── 第 0 步：检查是否登录 ─────────────────────────
+    if not request.user.is_authenticated:
+        return JsonResponse({"error": "请先登录"}, status=401)
 
-    # request.user 是什么？
-    #   Django 自动从 Cookie/Session 中解析出当前用户。
-    #   如果是 Apipost 调用且未登录 → request.user 是 AnonymousUser
-    #   需要先登录才能点赞（见 views.py 的 @login_required）
+    post = get_object_or_404(Post, slug=slug)
 
     # ── 检查是否已点赞 ───────────────────────────────
     if post.likes.filter(id=request.user.id).exists():
@@ -329,24 +328,18 @@ def api_post_comment(request, slug):
     - 这边从 JSON 请求体取数据：request.body → json.loads()
     """
 
+    # ── 第 0 步：检查是否登录 ─────────────────────────
+    if not request.user.is_authenticated:
+        return JsonResponse({"error": "请先登录"}, status=401)
+        # status=401 意为 "Unauthorized"——需要先验证身份
+
     post = get_object_or_404(Post, slug=slug)
 
     # ── 解析 JSON 请求体 ─────────────────────────────
-    # request.body: POST 请求的原始字节数据
-    #   比如 b'{"content":"好文章！"}'
-    #
-    # .decode('utf-8'): 把字节 → 字符串
-    #   b'{"content":"..."}' → '{"content":"..."}'
-    #
-    # json.loads(): 把 JSON 字符串 → Python 字典
-    #   '{"content":"..."}' → {"content": "..."}
-    #
-    # try/except: 如果 JSON 格式错误（比如少了引号），不崩溃，返回友好提示
     try:
         data = json.loads(request.body.decode('utf-8'))
     except json.JSONDecodeError:
         return JsonResponse({"error": "JSON 格式错误，请检查"}, status=400)
-    # status=400 意为 "Bad Request"——请求格式有问题，不是服务器的锅
 
     content = data.get('content', '').strip()
     if not content:
