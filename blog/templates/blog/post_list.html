@@ -78,7 +78,7 @@
 .card-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 40px 32px;
+    gap: 36px 28px;
 }
 @media (max-width: 640px) {
     .card-grid { grid-template-columns: 1fr; gap: 32px; }
@@ -101,11 +101,12 @@
 /* 封面图 */
 .card-cover {
     width: 100%;
-    aspect-ratio: 16 / 10;
+    max-height: 240px;
+    aspect-ratio: 3 / 2;
     overflow: hidden;
     border-radius: 4px;
     background: var(--surface);
-    margin-bottom: 20px;
+    margin-bottom: 16px;
 }
 .card-cover img {
     width: 100%;
