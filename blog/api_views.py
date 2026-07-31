@@ -29,11 +29,11 @@ import json  # Python 内置，处理 JSON 数据的标准库
 
 from django.http import JsonResponse
 # ↑ JsonResponse 是 Django 内置的 HTTP 响应类。
-#   它和 render() 的区别：
-#     render(request, '模板.html', {...})  → 返回 HTML 网页
-#     JsonResponse({...})                   → 返回 JSON 字符串
 
 from django.shortcuts import get_object_or_404
+from django.contrib.auth import authenticate, login
+# ↑ authenticate: 验证用户名密码是否正确
+#   login: 验证通过后创建 session，返回 Set-Cookie
 # ↑ get_object_or_404：从数据库查一条数据，找不到自动返回 404。
 #   等价于手动写：
 #     try: post = Post.objects.get(slug=slug)
@@ -367,7 +367,42 @@ def api_post_comment(request, slug):
 
 
 # ============================================================================
-# 接口 5：分类列表
+# 接口 5：API 登录（免 CSRF，给 Apipost 用）
+# ============================================================================
+# 请求方式: POST
+# URL:      /api/login/
+# 请求体:   { "username": "admin", "password": "admin123" }
+# 返回成功: { "ok": true, "username": "admin" }
+# 返回失败: { "error": "用户名或密码错误", "ok": false }
+#
+# 重点：登录成功后 Django 会返回 Set-Cookie 响应头，
+# Apipost 会自动保存 sessionid Cookie，后续请求自动带上。
+# ============================================================================
+
+@require_http_methods(["POST"])
+@csrf_exempt
+def api_login(request):
+    """JSON 登录接口。成功后 session 自动写入 Cookie。"""
+    try:
+        data = json.loads(request.body.decode('utf-8'))
+    except json.JSONDecodeError:
+        return JsonResponse({"ok": False, "error": "JSON 格式错误"}, status=400)
+
+    username = data.get('username', '')
+    password = data.get('password', '')
+    user = authenticate(request, username=username, password=password)
+
+    if user is None:
+        return JsonResponse({"ok": False, "error": "用户名或密码错误"}, status=401)
+
+    # login() 做了两件事：
+    # 1. 在服务端创建 session 记录
+    # 2. 在响应头里加 Set-Cookie: sessionid=xxx
+    login(request, user)
+    return JsonResponse({"ok": True, "username": user.username})
+
+# ============================================================================
+# 接口 6：分类列表
 # ============================================================================
 # 请求方式: GET
 # URL:      /api/categories/
