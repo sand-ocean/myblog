@@ -79,7 +79,10 @@
                     <a href="{% url 'post_new' %}">写文章</a>
                     <span class="text-[var(--soft)]" style="font-size:10px">·</span>
                     <span class="text-[var(--soft)]">{{ user.username }}</span>
-                    <a href="{% url 'logout' %}">退出</a>
+                    <form method="post" action="{% url 'logout' %}" style="display:inline">
+                        {% csrf_token %}
+                        <button type="submit" style="background:none;border:none;color:var(--soft);font-size:inherit;letter-spacing:0.04em;cursor:pointer;padding:0">退出</button>
+                    </form>
                 {% else %}
                     <a href="{% url 'login' %}">登录</a>
                     <a href="{% url 'register' %}">注册</a>
