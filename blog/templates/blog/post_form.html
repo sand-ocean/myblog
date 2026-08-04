@@ -68,27 +68,22 @@
                 <span id="upload-toast" style="font-size:10px;color:var(--accent);opacity:0;transition:opacity .3s">✓ 已上传</span>
             </div>
 
-            {#
+            {% comment %}
               ★ WangEditor 官方文档要求的 DOM 结构：
                  wrapper（外层盒子）
                    ├── toolbar-container（工具栏挂载点）
                    └── editor-container （编辑器挂载点）
-
                  两者必须是分开的 div，不能嵌套。
-                 工具栏创建时指定 selector: '#toolbar-container'
-                 编辑器创建时指定 selector: '#editor-container'
-            #}
+            {% endcomment %}
             <div id="editor-wrapper">
                 <div id="toolbar-container"></div>
                 <div id="editor-container"></div>
             </div>
 
-            {#
-              隐藏的 textarea。
-              为什么需要：Django form 通过 name="content" 接收数据。
-              WangEditor 本身不产生 <textarea> 的值，
-              所以我们在 onChange 和 submit 时手动把 HTML 同步到这里。
-            #}
+            {% comment %}
+              隐藏的 textarea——Django form 通过 name="content" 接收数据，
+              WangEditor 不产生 <textarea> 值，需要手动同步。
+            {% endcomment %}
             <textarea name="content" id="id_content" required style="display:none">{{ form.content.value|default:'' }}</textarea>
         </div>
 
@@ -129,26 +124,19 @@
 </div>
 {% endwith %}
 
-{#
-  ╔══════════════════════════════════════════════════╗
-  ║  1. 官方 CSS — 必须引入                           ║
-  ║     它提供：placeholder 定位、tooltip 样式、       ║
-  ║     工具栏布局、弹出面板、hoverbar…等基础 UI       ║
-  ║     不引入 = placeholder 飞出编辑框、toolbar 错位   ║
-  ╠══════════════════════════════════════════════════╣
-  ║  2. 官方 JS — createEditor + createToolbar       ║
-  ║     window.wangEditor 全局暴露这两个函数          ║
-  ║     createEditor({ selector, html, config })     ║
-  ║     createToolbar({ editor, selector, config })  ║
-  ╚══════════════════════════════════════════════════╝
-#}
+{% comment %}
+  1. 官方 CSS — 必须引入
+     它提供：placeholder 定位、tooltip 样式、
+     工具栏布局、弹出面板、hoverbar…等基础 UI
+     不引入 = placeholder 飞出编辑框、toolbar 错位
+  2. 官方 JS — createEditor + createToolbar
+     window.wangEditor 全局暴露这两个函数
+     createEditor({ selector, html, config })
+     createToolbar({ editor, selector, config })
+{% endcomment %}
 <link href="https://unpkg.com/@wangeditor/editor@5.1.23/dist/css/style.css" rel="stylesheet">
 
-{#
-  ─── 自定义 CSS ─────────────────────────────────────
-  策略：官方 CSS 处理布局，我们只覆盖颜色、尺寸、间距
-  用 !important 覆盖官方默认值，但不动 flex/position 等布局属性
-#}
+{% comment %}─── 自定义 CSS：只覆盖颜色尺寸，不动布局───{% endcomment %}
 <style>
 /* 📷 上传图片按钮 */
 .fmt-btn {
