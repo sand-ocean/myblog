@@ -106,6 +106,10 @@
     border-radius: 2px;
     display: flex; flex-direction: column;
 }
+/* WangEditor 默认 DOM 顺序是 text-container 在前，强制 toolbar 置顶 */
+#editor-container > .w-e-toolbar {
+    order: -1 !important;
+}
 #editor-container .w-e-toolbar {
     border: none !important; border-bottom: 1px solid var(--hairline) !important;
     border-radius: 0; background: transparent !important;
