@@ -99,11 +99,18 @@
 }
 .fmt-btn:hover { color: var(--ink); border-color: var(--ink); }
 
-/* WangEditor — 纯图标单行 */
+/* WangEditor — 工具栏在上，纯图标单行 */
 #editor-container {
     font-size: 15px; line-height: 1.8; color: var(--ink);
-    background: transparent; border: 1px solid var(--hairline) !important;
-    border-radius: 2px; overflow: hidden;
+    border: 1px solid var(--hairline) !important;
+    border-radius: 2px;
+}
+/* 强制工具栏置顶 */
+#editor-container > .w-e-toolbar {
+    order: 1 !important;
+}
+#editor-container > .w-e-text-container {
+    order: 2 !important;
 }
 #editor-container .w-e-toolbar {
     border: none !important; border-bottom: 1px solid var(--hairline) !important;
@@ -113,7 +120,7 @@
     display: flex; flex-wrap: nowrap; align-items: center;
 }
 #editor-container .w-e-bar {
-    display: flex; flex-wrap: nowrap; align-items: center; height: 30px;
+    display: flex; flex-wrap: nowrap; align-items: center; height: 28px;
 }
 #editor-container .w-e-bar-item {
     padding: 0; display: flex; align-items: center; height: 30px;
@@ -139,7 +146,7 @@
 }
 #editor-container .w-e-text-placeholder {
     color: #C4C0B6 !important; font-style: normal !important;
-    top: 14px; left: 16px; font-size: 15px;
+    top: 44px; left: 16px; font-size: 15px;
 }
 </style>
 
