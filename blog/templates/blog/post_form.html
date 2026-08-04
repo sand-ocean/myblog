@@ -99,50 +99,60 @@
 }
 .fmt-btn:hover { color: var(--ink); border-color: var(--ink); }
 
-/* WangEditor 样式覆盖 —— 融入博客极简风格 */
+/* WangEditor 样式覆盖 —— 极简横排单行 */
 #editor-container {
     font-size: 15px; line-height: 1.8; color: var(--ink);
     background: transparent; border: 1px solid var(--hairline) !important;
     border-radius: 4px; overflow: hidden;
 }
-/* 工具栏区域 */
+/* 工具栏 — 单行横排，紧凑 */
 #editor-container .w-e-toolbar {
     border: none !important; border-bottom: 1px solid var(--hairline) !important;
     border-radius: 0; background: transparent !important;
-    padding: 4px 8px; box-shadow: none !important;
+    padding: 3px 6px; box-shadow: none !important;
+    display: flex; flex-wrap: nowrap; align-items: center;
+    overflow-x: auto;
 }
-/* 单个按钮组 */
+/* 隐藏滚动条 */
+#editor-container .w-e-toolbar::-webkit-scrollbar { height: 0; }
+/* 按钮组横排 */
+#editor-container .w-e-bar {
+    display: flex; flex-wrap: nowrap; align-items: center; gap: 1px;
+}
 #editor-container .w-e-bar-item {
-    padding: 1px 2px;
+    padding: 0 1px; display: flex; align-items: center;
 }
 /* 按钮 */
 #editor-container .w-e-bar-item button {
-    width: 28px; height: 28px; padding: 4px; border-radius: 3px;
+    width: 26px; height: 26px; padding: 3px; border-radius: 3px;
     color: var(--soft); background: transparent; border: none;
-    transition: all .2s;
+    transition: all .15s; display: flex; align-items: center; justify-content: center;
 }
 #editor-container .w-e-bar-item button:hover { background: var(--hairline); color: var(--ink); }
-#editor-container .w-e-bar-item button svg { width: 14px; height: 14px; }
-/* 下拉选择器（标题层级 / 字号 / 字体） */
+#editor-container .w-e-bar-item button svg { width: 13px; height: 13px; }
+/* 下拉选择器 */
 #editor-container .w-e-bar-item .w-e-select {
-    height: 28px; font-size: 11px; color: var(--soft); border-radius: 3px;
+    height: 26px; font-size: 11px; color: var(--soft); border-radius: 3px;
+    border: none; background: transparent;
 }
 #editor-container .w-e-bar-item .w-e-select:hover { background: var(--hairline); color: var(--ink); }
 #editor-container .w-e-bar-item .w-e-select .w-e-select-selected {
-    padding: 0 6px; line-height: 28px; font-size: 11px;
+    padding: 0 5px; line-height: 26px; font-size: 11px;
 }
-/* 分割线 */
-#editor-container .w-e-bar-divider { margin: 0 4px; height: 18px; background: var(--hairline) !important; }
-/* 编辑区域 */
+/* 分割线 — 细窄 */
+#editor-container .w-e-bar-divider {
+    margin: 0 2px; width: 1px; height: 16px; background: var(--hairline) !important;
+}
+/* 编辑区 */
 #editor-container .w-e-text-container {
     background: transparent !important; border: none !important;
 }
 #editor-container .w-e-text-container [data-slate-editor] {
-    padding: 16px; min-height: 360px;
+    padding: 14px 16px; min-height: 360px;
 }
 #editor-container .w-e-text-placeholder {
     color: #C4C0B6 !important; font-style: normal !important;
-    top: 16px; left: 16px;
+    top: 14px; left: 16px; font-size: 15px;
 }
 </style>
 
