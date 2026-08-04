@@ -99,13 +99,51 @@
 }
 .fmt-btn:hover { color: var(--ink); border-color: var(--ink); }
 
-/* WangEditor 样式覆盖 —— 融入博客风格 */
-#editor-container { font-size: 15px; line-height: 1.8; color: var(--ink); background: transparent; }
-#editor-container .w-e-text-container { background: transparent !important; border: none !important; }
-#editor-container .w-e-text-container [data-slate-editor] { padding: 16px; min-height: 380px; }
-#editor-container .w-e-toolbar { border-radius: 3px 3px 0 0; border-color: var(--hairline) !important; background: var(--surface) !important; }
-#editor-container .w-e-bar-item button:hover { color: var(--ink); }
-#editor-container .w-e-text-placeholder { color: #C4C0B6 !important; font-style: normal !important; top: 16px; left: 16px; }
+/* WangEditor 样式覆盖 —— 融入博客极简风格 */
+#editor-container {
+    font-size: 15px; line-height: 1.8; color: var(--ink);
+    background: transparent; border: 1px solid var(--hairline) !important;
+    border-radius: 4px; overflow: hidden;
+}
+/* 工具栏区域 */
+#editor-container .w-e-toolbar {
+    border: none !important; border-bottom: 1px solid var(--hairline) !important;
+    border-radius: 0; background: transparent !important;
+    padding: 4px 8px; box-shadow: none !important;
+}
+/* 单个按钮组 */
+#editor-container .w-e-bar-item {
+    padding: 1px 2px;
+}
+/* 按钮 */
+#editor-container .w-e-bar-item button {
+    width: 28px; height: 28px; padding: 4px; border-radius: 3px;
+    color: var(--soft); background: transparent; border: none;
+    transition: all .2s;
+}
+#editor-container .w-e-bar-item button:hover { background: var(--hairline); color: var(--ink); }
+#editor-container .w-e-bar-item button svg { width: 14px; height: 14px; }
+/* 下拉选择器（标题层级 / 字号 / 字体） */
+#editor-container .w-e-bar-item .w-e-select {
+    height: 28px; font-size: 11px; color: var(--soft); border-radius: 3px;
+}
+#editor-container .w-e-bar-item .w-e-select:hover { background: var(--hairline); color: var(--ink); }
+#editor-container .w-e-bar-item .w-e-select .w-e-select-selected {
+    padding: 0 6px; line-height: 28px; font-size: 11px;
+}
+/* 分割线 */
+#editor-container .w-e-bar-divider { margin: 0 4px; height: 18px; background: var(--hairline) !important; }
+/* 编辑区域 */
+#editor-container .w-e-text-container {
+    background: transparent !important; border: none !important;
+}
+#editor-container .w-e-text-container [data-slate-editor] {
+    padding: 16px; min-height: 360px;
+}
+#editor-container .w-e-text-placeholder {
+    color: #C4C0B6 !important; font-style: normal !important;
+    top: 16px; left: 16px;
+}
 </style>
 
 <!-- WangEditor -->
@@ -147,7 +185,21 @@
         editor,
         selector: '#editor-container',
         config: {
-            excludeKeys: ['uploadImage', 'uploadVideo', 'group-image', 'group-video', 'fullScreen'],
+            toolbarKeys: [
+                'headerSelect',
+                '|',
+                'bold', 'italic', 'underline',
+                '|',
+                'blockquote', 'code', 'bulletedList', 'numberedList',
+                '|',
+                'insertLink',
+                { key: 'group-image', title: '图片', iconSvg: '<svg viewBox="0 0 1024 1024"><path d="M959.2 383.9c-0.2-22.6-18.3-40.7-40.8-40.7H667.3L625.7 222c-1.8-5.1-6.5-8.5-11.9-8.5H409.9c-5.5 0-10.2 3.5-11.9 8.5l-41.4 121.2H105.6c-22.6 0-40.7 18.3-40.8 40.7l-0.3 424.6c0 22.6 18.3 40.8 40.8 40.8h813.4c22.5 0 40.8-18.3 40.8-40.8L959.2 383.9zM512 736c-97.2 0-176-78.8-176-176s78.8-176 176-176 176 78.8 176 176-78.8 176-176 176z m0-288c-61.8 0-112 50.2-112 112s50.2 112 112 112 112-50.2 112-112-50.2-112-112-112z"/></svg>', menuKeys: ['insertImage'] },
+                '|',
+                'undo', 'redo',
+                '|',
+                'clearStyle',
+            ],
+            excludeKeys: ['fullScreen'],
         },
         mode: 'default',
     });
