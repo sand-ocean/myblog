@@ -3,19 +3,19 @@
 {% block title %}{% if form.instance.pk %}编辑{% else %}写文章{% endif %} — mineblog{% endblock %}
 {% block content %}
 
-{# ────────────────────────────────────────────────── #}
-{#  is_edit 变量：判断是「新建文章」还是「编辑已有文章」 #}
-{#  如果 form.instance.pk 有值 = 编辑；无值 = 新建       #}
-{# ────────────────────────────────────────────────── #}
+<!-- ────────────────────────────────────────────────── -->
+<!--  is_edit 变量：判断是「新建文章」还是「编辑已有文章」 -->
+<!--  如果 form.instance.pk 有值 = 编辑；无值 = 新建       -->
+<!-- ────────────────────────────────────────────────── -->
 {% with is_edit=form.instance.pk %}
 <div class="narrow">
 
-    {# 页面标题：编辑文章 or 新文章 #}
+    <!-- 页面标题：编辑文章 or 新文章 -->
     <p class="label" style="margin-bottom:12px">
         {% if is_edit %}编辑文章{% else %}新文章{% endif %}
     </p>
 
-    {# 文件导入提示：显示导入的文件名 + 重新导入链接 #}
+    <!-- 文件导入提示：显示导入的文件名 + 重新导入链接 -->
     {% if imported_filename %}
     <p style="font-size:12px;margin-bottom:24px;color:var(--soft)">
         📄 从 <em>{{ imported_filename }}</em> 导入&ensp;
@@ -27,30 +27,30 @@
     </p>
     {% endif %}
 
-    {# ─── 表单开始 ─── #}
+    <!-- ─── 表单开始 ─── -->
     <form method="post" id="post-form" novalidate>
         {% csrf_token %}
-        {# ★ 隐藏字段：标记新文章用 HTML 格式存，老文章保持 Markdown #}
+        <!-- ★ 隐藏字段：标记新文章用 HTML 格式存，老文章保持 Markdown -->
         <input type="hidden" name="content_format" value="html">
 
-        {# Django 表单校验错误 #}
+        <!-- Django 表单校验错误 -->
         {% if form.errors %}
         <div style="color:var(--accent);font-size:12px;margin-bottom:32px;line-height:1.6">
             {% for field, errors in form.errors.items %}{% for error in errors %}{{ error }}&ensp;{% endfor %}{% endfor %}
         </div>
         {% endif %}
 
-        {# ─── 标题字段 ─── #}
+        <!-- ─── 标题字段 ─── -->
         <div style="margin-bottom:32px">
             <input type="text" name="title" id="id_title" value="{{ form.title.value|default:'' }}" required maxlength="200"
                    placeholder="标题" style="font-size:20px">
         </div>
 
-        {# ─── Slug 字段（URL 友好的短链接）─── #}
+        <!-- ─── Slug 字段（URL 友好的短链接）─── -->
         <div style="margin-bottom:32px">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
                 <span class="label">链接</span>
-                {# 自动生成 badge：标题变化时 JS 自动填 slug #}
+                <!-- 自动生成 badge：标题变化时 JS 自动填 slug -->
                 <span id="slug-auto-badge" style="font-size:9px;color:var(--accent);letter-spacing:0.05em;display:none">自动</span>
                 <button type="button" id="slug-edit-btn" style="background:none;border:none;color:var(--soft);font-size:9px;cursor:pointer;letter-spacing:0.05em;display:none">手动编辑</button>
             </div>
@@ -58,11 +58,11 @@
                    placeholder="根据标题自动生成" style="font-family:monospace;font-size:13px;color:var(--soft)">
         </div>
 
-        {# ═══════════════════════════════════════ #}
-        {#  === WangEditor 富文本编辑器区域 ===     #}
-        {# ═══════════════════════════════════════ #}
+        <!-- ═══════════════════════════════════════ -->
+        <!--  === WangEditor 富文本编辑器区域 ===     -->
+        <!-- ═══════════════════════════════════════ -->
         <div style="margin-bottom:48px">
-            {# Cloudinary 图片上传按钮 + 上传成功反馈 #}
+            <!-- Cloudinary 图片上传按钮 + 上传成功反馈 -->
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
                 <button type="button" id="upload-image-btn" class="fmt-btn" title="上传图片到光标位置">📷 上传图片</button>
                 <span id="upload-toast" style="font-size:10px;color:var(--accent);opacity:0;transition:opacity .3s">✓ 已上传</span>
@@ -87,7 +87,7 @@
             <textarea name="content" id="id_content" required style="display:none">{{ form.content.value|default:'' }}</textarea>
         </div>
 
-        {# ─── 分类选择 + 发布状态 ─── #}
+        <!-- ─── 分类选择 + 发布状态 ─── -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:48px">
             <div>
                 <p class="label" style="margin-bottom:12px">分类</p>
@@ -113,7 +113,7 @@
         </div>
 
         <hr>
-        {# ─── 操作按钮 ─── #}
+        <!-- ─── 操作按钮 ─── -->
         <div style="display:flex;gap:16px">
             <button type="submit" name="action" value="draft" class="btn">存草稿</button>
             <button type="submit" name="action" value="publish" class="btn btn-primary">发布</button>
@@ -200,11 +200,7 @@
 }
 </style>
 
-{#
-  ─── JS 依赖 ────────────────────────────────────────
-  1. WangEditor 核心库（window.wangEditor）
-  2. Cloudinary Upload Widget（图片上传）
-#}
+{% comment %}─── JS 依赖：WangEditor + Cloudinary───{% endcomment %}
 <script src="https://unpkg.com/@wangeditor/editor@5.1.23/dist/index.js"></script>
 <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
 
@@ -262,14 +258,14 @@
     // ═══════════════════════════════════════════
     //  第 3 步：填入初始内容（编辑模式）
     // ═══════════════════════════════════════════
-    {# 情况 A：视图传了 editor_content（老 Markdown 文章已转 HTML） #}
+    <!-- 情况 A：视图传了 editor_content（老 Markdown 文章已转 HTML） -->
     {% if editor_content %}
         editor.setHtml('{{ editor_content|escapejs }}');
     {% elif form.content.value %}
-        {# 情况 B：编辑已有文章，但内容是 Markdown → 先用 |markdown 转 HTML #}
+        <!-- 情况 B：编辑已有文章，但内容是 Markdown → 先用 |markdown 转 HTML -->
         {% if form.instance.pk and form.instance.content_format == 'markdown' %}
             editor.setHtml('{{ form.content.value|markdown|escapejs }}');
-        {# 情况 C：编辑已有 HTML 文章 → 直接放 #}
+        <!-- 情况 C：编辑已有 HTML 文章 → 直接放 -->
         {% else %}
             editor.setHtml('{{ form.content.value|escapejs }}');
         {% endif %}
