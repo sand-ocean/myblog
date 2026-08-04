@@ -46,13 +46,13 @@
                    placeholder="根据标题自动生成" style="font-family:monospace;font-size:13px;color:var(--soft)">
         </div>
 
-        <!-- WangEditor 富文本编辑器 -->
+        <!-- WangEditor -->
         <div style="margin-bottom:48px">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
                 <button type="button" id="upload-image-btn" class="fmt-btn" title="上传图片到光标位置">📷 上传图片</button>
-                <span style="font-size:10px;color:var(--soft)">Ctrl+B 加粗 · Ctrl+I 斜体 · 直接拖图到编辑器</span>
+                <span id="upload-toast" style="font-size:10px;color:var(--accent);opacity:0;transition:opacity .3s">✓ 已上传</span>
             </div>
-            <div id="editor-container" style="min-height:400px;border:1px solid var(--hairline);border-radius:3px"></div>
+            <div id="editor-container" style="min-height:400px;border:1px solid var(--hairline);border-radius:2px"></div>
             <textarea name="content" id="id_content" required style="display:none">{{ form.content.value|default:'' }}</textarea>
         </div>
 
@@ -99,13 +99,12 @@
 }
 .fmt-btn:hover { color: var(--ink); border-color: var(--ink); }
 
-/* WangEditor 样式覆盖 —— 纯图标单行，不滚动 */
+/* WangEditor — 纯图标单行 */
 #editor-container {
     font-size: 15px; line-height: 1.8; color: var(--ink);
     background: transparent; border: 1px solid var(--hairline) !important;
-    border-radius: 4px; overflow: hidden;
+    border-radius: 2px; overflow: hidden;
 }
-/* 工具栏 — 强制单行 */
 #editor-container .w-e-toolbar {
     border: none !important; border-bottom: 1px solid var(--hairline) !important;
     border-radius: 0; background: transparent !important;
@@ -113,15 +112,12 @@
     height: 30px; overflow: hidden;
     display: flex; flex-wrap: nowrap; align-items: center;
 }
-/* 按钮组 */
 #editor-container .w-e-bar {
-    display: flex; flex-wrap: nowrap; align-items: center;
-    height: 30px;
+    display: flex; flex-wrap: nowrap; align-items: center; height: 30px;
 }
 #editor-container .w-e-bar-item {
     padding: 0; display: flex; align-items: center; height: 30px;
 }
-/* 按钮 — 小方块图标 */
 #editor-container .w-e-bar-item button {
     width: 24px; height: 24px; padding: 3px; border-radius: 3px;
     color: var(--soft); background: transparent; border: none;
@@ -130,14 +126,11 @@
 }
 #editor-container .w-e-bar-item button:hover { background: var(--hairline); color: var(--ink); }
 #editor-container .w-e-bar-item button svg { width: 12px; height: 12px; }
-/* 分割线 */
 #editor-container .w-e-bar-divider {
     margin: 0 2px; width: 1px; height: 14px; background: var(--hairline) !important;
 }
-/* 隐藏下拉弹出面板的三角标 */
 #editor-container .w-e-bar-item .w-e-select,
 #editor-container .w-e-bar-item .w-e-dropdown { display: none !important; }
-/* 编辑区 */
 #editor-container .w-e-text-container {
     background: transparent !important; border: none !important;
 }
@@ -150,31 +143,17 @@
 }
 </style>
 
-<!-- WangEditor -->
 <script src="https://unpkg.com/@wangeditor/editor@5.1.23/dist/index.js"></script>
-
-<!-- Cloudinary Upload Widget -->
 <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
 
 <script>
 (function(){
-    // ── 初始化 WangEditor ──
-    const { createEditor, createToolbar, Boot } = window.wangEditor;
+    const { createEditor, createToolbar } = window.wangEditor;
 
     const editorConfig = {
         placeholder: '写点什么 ...',
         onChange(editor) {
-            // 同步到隐藏 textarea
             document.getElementById('id_content').value = editor.getHtml();
-        },
-        MENU_CONF: {
-            uploadImage: {
-                // 自定义图片上传 —— 我们用 Cloudinary，这里留空阻止默认行为
-                async customUpload(file, insertFn) {
-                    // 由 Cloudinary widget 处理
-                    return;
-                }
-            }
         }
     };
 
@@ -195,30 +174,39 @@
                 'blockquote', 'code', 'bulletedList', 'numberedList',
                 '|',
                 'insertLink',
-                { key: 'group-image', title: '图片', iconSvg: '<svg viewBox="0 0 1024 1024"><path d="M959.2 383.9c-0.2-22.6-18.3-40.7-40.8-40.7H667.3L625.7 222c-1.8-5.1-6.5-8.5-11.9-8.5H409.9c-5.5 0-10.2 3.5-11.9 8.5l-41.4 121.2H105.6c-22.6 0-40.7 18.3-40.8 40.7l-0.3 424.6c0 22.6 18.3 40.8 40.8 40.8h813.4c22.5 0 40.8-18.3 40.8-40.8L959.2 383.9zM512 736c-97.2 0-176-78.8-176-176s78.8-176 176-176 176 78.8 176 176-78.8 176-176 176z m0-288c-61.8 0-112 50.2-112 112s50.2 112 112 112 112-50.2 112-112-50.2-112-112-112z"/></svg>', menuKeys: ['insertImage'] },
                 '|',
                 'undo', 'redo',
                 '|',
                 'clearStyle',
             ],
-            excludeKeys: ['fullScreen'],
         },
         mode: 'default',
     });
 
-    // ── 设置初始内容 ──
+    // ── 工具栏 tooltip ──
+    setTimeout(function(){
+        var tips = {
+            'bold': '加粗 Ctrl+B', 'italic': '斜体 Ctrl+I', 'underline': '下划线',
+            'blockquote': '引用', 'code': '行内代码', 'bulletedList': '无序列表',
+            'numberedList': '有序列表', 'insertLink': '插入链接',
+            'undo': '撤销', 'redo': '重做', 'clearStyle': '清除格式'
+        };
+        document.querySelectorAll('#editor-container .w-e-bar-item button').forEach(function(btn){
+            var key = btn.getAttribute('data-menu-key') || '';
+            if (tips[key]) btn.title = tips[key];
+        });
+    }, 300);
+
+    // ── 初始内容 ──
     {% if editor_content %}
         editor.setHtml('{{ editor_content|escapejs }}');
     {% elif form.content.value %}
-        // 编辑模式：旧 Markdown 转 HTML
         {% if form.instance.pk and form.instance.content_format == 'markdown' %}
             editor.setHtml('{{ form.content.value|markdown|escapejs }}');
         {% else %}
             editor.setHtml('{{ form.content.value|escapejs }}');
         {% endif %}
     {% endif %}
-
-    // 初始化隐藏 textarea
     document.getElementById('id_content').value = editor.getHtml();
 
     // ── Slug 自动生成 ──
@@ -268,26 +256,26 @@
         maxFileSize: 10000000,
     }, function(error, result) {
         if (!error && result && result.event === 'success') {
-            // 直接插入编辑器光标位置
             var url = result.info.secure_url;
             var alt = result.info.original_filename || 'image';
-            editor.insertNode({
-                type: 'image',
-                src: url,
-                alt: alt,
-                href: url,
-                children: [{ text: '' }]
-            });
+            editor.insertNode({ type: 'image', src: url, alt: alt, href: url, children: [{ text: '' }] });
             editor.focus(true);
+            var toast = document.getElementById('upload-toast');
+            toast.style.opacity = '1';
+            setTimeout(function(){ toast.style.opacity = '0'; }, 2000);
         }
     });
 
     document.getElementById('upload-image-btn').addEventListener('click', function(){ widget.open(); });
 
-    // ── 提交前同步 ──
+    // ── 提交前清理 ──
     var form = document.getElementById('post-form');
     form.addEventListener('submit', function(){
-        document.getElementById('id_content').value = editor.getHtml();
+        var html = editor.getHtml();
+        html = html.replace(/<p><br><\/p>/g, '');
+        html = html.replace(/<p>\s*<\/p>/g, '');
+        editor.setHtml(html);
+        document.getElementById('id_content').value = html;
     });
 
     // ── Ctrl+S 保存草稿 ──
