@@ -3,13 +3,19 @@
 {% block title %}{% if form.instance.pk %}编辑{% else %}写文章{% endif %} — mineblog{% endblock %}
 {% block content %}
 
+{# ────────────────────────────────────────────────── #}
+{#  is_edit 变量：判断是「新建文章」还是「编辑已有文章」 #}
+{#  如果 form.instance.pk 有值 = 编辑；无值 = 新建       #}
+{# ────────────────────────────────────────────────── #}
 {% with is_edit=form.instance.pk %}
 <div class="narrow">
 
+    {# 页面标题：编辑文章 or 新文章 #}
     <p class="label" style="margin-bottom:12px">
         {% if is_edit %}编辑文章{% else %}新文章{% endif %}
     </p>
 
+    {# 文件导入提示：显示导入的文件名 + 重新导入链接 #}
     {% if imported_filename %}
     <p style="font-size:12px;margin-bottom:24px;color:var(--soft)">
         📄 从 <em>{{ imported_filename }}</em> 导入&ensp;
@@ -21,24 +27,30 @@
     </p>
     {% endif %}
 
+    {# ─── 表单开始 ─── #}
     <form method="post" id="post-form" novalidate>
         {% csrf_token %}
+        {# ★ 隐藏字段：标记新文章用 HTML 格式存，老文章保持 Markdown #}
         <input type="hidden" name="content_format" value="html">
 
+        {# Django 表单校验错误 #}
         {% if form.errors %}
         <div style="color:var(--accent);font-size:12px;margin-bottom:32px;line-height:1.6">
             {% for field, errors in form.errors.items %}{% for error in errors %}{{ error }}&ensp;{% endfor %}{% endfor %}
         </div>
         {% endif %}
 
+        {# ─── 标题字段 ─── #}
         <div style="margin-bottom:32px">
             <input type="text" name="title" id="id_title" value="{{ form.title.value|default:'' }}" required maxlength="200"
                    placeholder="标题" style="font-size:20px">
         </div>
 
+        {# ─── Slug 字段（URL 友好的短链接）─── #}
         <div style="margin-bottom:32px">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
                 <span class="label">链接</span>
+                {# 自动生成 badge：标题变化时 JS 自动填 slug #}
                 <span id="slug-auto-badge" style="font-size:9px;color:var(--accent);letter-spacing:0.05em;display:none">自动</span>
                 <button type="button" id="slug-edit-btn" style="background:none;border:none;color:var(--soft);font-size:9px;cursor:pointer;letter-spacing:0.05em;display:none">手动编辑</button>
             </div>
@@ -46,22 +58,41 @@
                    placeholder="根据标题自动生成" style="font-family:monospace;font-size:13px;color:var(--soft)">
         </div>
 
-        <!-- WangEditor 富文本编辑器 -->
+        {# ═══════════════════════════════════════ #}
+        {#  === WangEditor 富文本编辑器区域 ===     #}
+        {# ═══════════════════════════════════════ #}
         <div style="margin-bottom:48px">
+            {# Cloudinary 图片上传按钮 + 上传成功反馈 #}
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
                 <button type="button" id="upload-image-btn" class="fmt-btn" title="上传图片到光标位置">📷 上传图片</button>
                 <span id="upload-toast" style="font-size:10px;color:var(--accent);opacity:0;transition:opacity .3s">✓ 已上传</span>
             </div>
 
-            <!-- 官方文档要求的 DOM 结构：wrapper > toolbar-container + editor-container -->
+            {#
+              ★ WangEditor 官方文档要求的 DOM 结构：
+                 wrapper（外层盒子）
+                   ├── toolbar-container（工具栏挂载点）
+                   └── editor-container （编辑器挂载点）
+
+                 两者必须是分开的 div，不能嵌套。
+                 工具栏创建时指定 selector: '#toolbar-container'
+                 编辑器创建时指定 selector: '#editor-container'
+            #}
             <div id="editor-wrapper">
                 <div id="toolbar-container"></div>
                 <div id="editor-container"></div>
             </div>
 
+            {#
+              隐藏的 textarea。
+              为什么需要：Django form 通过 name="content" 接收数据。
+              WangEditor 本身不产生 <textarea> 的值，
+              所以我们在 onChange 和 submit 时手动把 HTML 同步到这里。
+            #}
             <textarea name="content" id="id_content" required style="display:none">{{ form.content.value|default:'' }}</textarea>
         </div>
 
+        {# ─── 分类选择 + 发布状态 ─── #}
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:48px">
             <div>
                 <p class="label" style="margin-bottom:12px">分类</p>
@@ -87,6 +118,7 @@
         </div>
 
         <hr>
+        {# ─── 操作按钮 ─── #}
         <div style="display:flex;gap:16px">
             <button type="submit" name="action" value="draft" class="btn">存草稿</button>
             <button type="submit" name="action" value="publish" class="btn btn-primary">发布</button>
@@ -97,11 +129,28 @@
 </div>
 {% endwith %}
 
-<!-- 官方 CSS — 处理 placeholder / tooltip / 工具栏布局等基础 UI -->
+{#
+  ╔══════════════════════════════════════════════════╗
+  ║  1. 官方 CSS — 必须引入                           ║
+  ║     它提供：placeholder 定位、tooltip 样式、       ║
+  ║     工具栏布局、弹出面板、hoverbar…等基础 UI       ║
+  ║     不引入 = placeholder 飞出编辑框、toolbar 错位   ║
+  ╠══════════════════════════════════════════════════╣
+  ║  2. 官方 JS — createEditor + createToolbar       ║
+  ║     window.wangEditor 全局暴露这两个函数          ║
+  ║     createEditor({ selector, html, config })     ║
+  ║     createToolbar({ editor, selector, config })  ║
+  ╚══════════════════════════════════════════════════╝
+#}
 <link href="https://unpkg.com/@wangeditor/editor@5.1.23/dist/css/style.css" rel="stylesheet">
 
-<!-- 我们只覆盖颜色、尺寸，不动布局 -->
+{#
+  ─── 自定义 CSS ─────────────────────────────────────
+  策略：官方 CSS 处理布局，我们只覆盖颜色、尺寸、间距
+  用 !important 覆盖官方默认值，但不动 flex/position 等布局属性
+#}
 <style>
+/* 📷 上传图片按钮 */
 .fmt-btn {
     background: none; border: 1px solid var(--hairline); border-radius: 3px;
     padding: 3px 10px; font-size: 12px; color: var(--soft); cursor: pointer;
@@ -109,18 +158,19 @@
 }
 .fmt-btn:hover { color: var(--ink); border-color: var(--ink); }
 
-/* wrapper */
+/* wrapper：外层盒子，加细边框统一样式 */
 #editor-wrapper {
     border: 1px solid var(--hairline) !important;
     border-radius: 2px;
     overflow: hidden;
 }
 
-/* 工具栏 */
+/* ── 工具栏 ── */
 #toolbar-container {
     border-bottom: 1px solid var(--hairline) !important;
     background: transparent !important;
 }
+/* 工具栏本体：强制单行 30px 高，不换行，不滚动 */
 #toolbar-container .w-e-toolbar {
     border: none !important; border-radius: 0;
     background: transparent !important;
@@ -130,6 +180,7 @@
     height: 30px;
     overflow: hidden;
 }
+/* 单个按钮：24x24 小方块，暖纸色系 */
 #toolbar-container .w-e-bar-item button {
     width: 24px; height: 24px; padding: 3px;
     color: var(--soft); background: transparent; border: none;
@@ -138,14 +189,15 @@
 }
 #toolbar-container .w-e-bar-item button:hover { background: var(--hairline); color: var(--ink); }
 #toolbar-container .w-e-bar-item button svg { width: 12px; height: 12px; }
+/* 按钮间分隔线 */
 #toolbar-container .w-e-bar-divider {
     margin: 0 2px; width: 1px; height: 14px; background: var(--hairline) !important;
 }
-/* 隐藏下拉选择器文字 */
+/* 隐藏下拉选择器（标题层级选择等），保持纯图标 */
 #toolbar-container .w-e-bar-item .w-e-select,
 #toolbar-container .w-e-bar-item .w-e-dropdown { display: none !important; }
 
-/* 编辑器 */
+/* ── 编辑区 ── */
 #editor-container {
     background: transparent !important;
     height: auto !important;
@@ -153,26 +205,41 @@
 #editor-container .w-e-text-container {
     background: transparent !important; border: none !important;
 }
+/* 编辑区内的 slate 编辑器：最小高度 360px，暖纸字体 */
 #editor-container .w-e-text-container [data-slate-editor] {
     padding: 14px 16px; min-height: 360px;
     font-size: 15px; line-height: 1.8; color: var(--ink);
 }
 </style>
 
+{#
+  ─── JS 依赖 ────────────────────────────────────────
+  1. WangEditor 核心库（window.wangEditor）
+  2. Cloudinary Upload Widget（图片上传）
+#}
 <script src="https://unpkg.com/@wangeditor/editor@5.1.23/dist/index.js"></script>
 <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
 
 <script>
 (function(){
+    // ═══════════════════════════════════════════
+    //  第 1 步：创建编辑器
+    // ═══════════════════════════════════════════
     const { createEditor, createToolbar } = window.wangEditor;
 
+    // editorConfig：编辑器行为配置
     const editorConfig = {
+        // placeholder 由官方 CSS 自动定位到编辑框内部
         placeholder: '写点什么 ...',
+        // 每次内容变化 → 同步到隐藏 textarea（Django form 要读）
         onChange(editor) {
             document.getElementById('id_content').value = editor.getHtml();
         }
     };
 
+    // createEditor：挂载编辑器到 #editor-container
+    // html: '<p><br></p>' 是官方推荐的空编辑器的初始 HTML
+    // mode: 'default' = 全功能模式，'simple' = 简洁模式
     const editor = createEditor({
         selector: '#editor-container',
         html: '<p><br></p>',
@@ -180,38 +247,53 @@
         mode: 'default',
     });
 
+    // ═══════════════════════════════════════════
+    //  第 2 步：创建工具栏（挂在 #toolbar-container）
+    // ═══════════════════════════════════════════
+    // toolbarKeys：一排排的按钮 key，「|」是分隔线
+    // 每个 key 对应一个内置菜单，官方有 50+ 个可选
     const toolbar = createToolbar({
         editor,
         selector: '#toolbar-container',
         config: {
             toolbarKeys: [
-                'bold', 'italic', 'underline',
+                'bold', 'italic', 'underline',           // 加粗 斜体 下划线
                 '|',
-                'blockquote', 'code', 'bulletedList', 'numberedList',
+                'blockquote', 'code', 'bulletedList', 'numberedList',  // 引用 代码 无序/有序列表
                 '|',
-                'insertLink',
+                'insertLink',                            // 插入链接
                 '|',
-                'undo', 'redo',
+                'undo', 'redo',                          // 撤销 重做
                 '|',
-                'clearStyle',
+                'clearStyle',                            // 清除格式
             ],
         },
         mode: 'default',
     });
 
-    // ── 初始内容 ──
+    // ═══════════════════════════════════════════
+    //  第 3 步：填入初始内容（编辑模式）
+    // ═══════════════════════════════════════════
+    {# 情况 A：视图传了 editor_content（老 Markdown 文章已转 HTML） #}
     {% if editor_content %}
         editor.setHtml('{{ editor_content|escapejs }}');
     {% elif form.content.value %}
+        {# 情况 B：编辑已有文章，但内容是 Markdown → 先用 |markdown 转 HTML #}
         {% if form.instance.pk and form.instance.content_format == 'markdown' %}
             editor.setHtml('{{ form.content.value|markdown|escapejs }}');
+        {# 情况 C：编辑已有 HTML 文章 → 直接放 #}
         {% else %}
             editor.setHtml('{{ form.content.value|escapejs }}');
         {% endif %}
     {% endif %}
+    // 初始化隐藏 textarea 的值
     document.getElementById('id_content').value = editor.getHtml();
 
-    // ── Slug 自动生成 ──
+    // ═══════════════════════════════════════════
+    //  Slug 自动生成
+    //  原理：监听标题 input → 英文转 slug → 中文用日期
+    //  用户手动改了 slug → 退出自动模式
+    // ═══════════════════════════════════════════
     const titleEl = document.getElementById('id_title');
     const slugEl = document.getElementById('id_slug');
     const badge = document.getElementById('slug-auto-badge');
@@ -219,11 +301,14 @@
     var autoSlug = true, userTouched = false;
 
     function slugify(text) {
+        // 只保留英文、数字、中文、空格、连字符
         var eng = text.replace(/[^a-zA-Z0-9一-鿿\s-]/g, '');
+        // 如果英文部分 ≥ 3 个字符 → 用它做 slug
         var engOnly = eng.replace(/[一-鿿]/g, '').trim();
         if (engOnly.length >= 3) {
             return engOnly.toLowerCase().replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
         }
+        // 纯中文标题 → 用日期做 slug
         var now = new Date();
         var pad = function(n){ return n < 10 ? '0'+n : ''+n; };
         var datePrefix = now.getFullYear() + '-' + pad(now.getMonth()+1) + '-' + pad(now.getDate());
@@ -239,7 +324,10 @@
     }
 
     titleEl.addEventListener('input', function(){ if (!userTouched) updateSlug(); });
-    slugEl.addEventListener('input', function(){ userTouched = true; autoSlug = false; badge.style.display = 'none'; editBtn.style.display = 'none'; });
+    slugEl.addEventListener('input', function(){
+        userTouched = true; autoSlug = false;
+        badge.style.display = 'none'; editBtn.style.display = 'none';
+    });
     editBtn.addEventListener('click', function(){
         userTouched = true; autoSlug = true;
         badge.style.display = 'none'; editBtn.style.display = 'none';
@@ -248,20 +336,27 @@
     });
     if (!slugEl.value) updateSlug();
 
-    // ── Cloudinary 图片上传 ──
+    // ═══════════════════════════════════════════
+    //  Cloudinary 图片上传
+    //  流程：点 📷 → Cloudinary Widget → 上传成功
+    //       → editor.insertNode() 插入图片到光标
+    //       → 显示 "✓ 已上传" 2 秒
+    // ═══════════════════════════════════════════
     var widget = cloudinary.createUploadWidget({
-        cloudName: 'tm0rl5co',
-        uploadPreset: 'myblog_upload',
-        sources: ['local', 'url'],
-        multiple: false,
+        cloudName: 'tm0rl5co',              // Cloudinary 账号
+        uploadPreset: 'myblog_upload',      // 未签名上传预设
+        sources: ['local', 'url'],          // 本地文件 或 URL
+        multiple: false,                    // 单张上传
         clientAllowedFormats: ['png', 'jpg', 'jpeg', 'gif', 'webp'],
-        maxFileSize: 10000000,
+        maxFileSize: 10000000,              // 最大 10MB
     }, function(error, result) {
         if (!error && result && result.event === 'success') {
             var url = result.info.secure_url;
             var alt = result.info.original_filename || 'image';
+            // insertNode：在光标位置插入一个 image 节点
             editor.insertNode({ type: 'image', src: url, alt: alt, href: url, children: [{ text: '' }] });
             editor.focus(true);
+            // 上传成功反馈
             var toast = document.getElementById('upload-toast');
             toast.style.opacity = '1';
             setTimeout(function(){ toast.style.opacity = '0'; }, 2000);
@@ -270,17 +365,21 @@
 
     document.getElementById('upload-image-btn').addEventListener('click', function(){ widget.open(); });
 
-    // ── 提交前清理 ──
+    // ═══════════════════════════════════════════
+    //  提交前处理
+    //  1. 清除空段落（<p><br></p>）
+    //  2. 同步 editor HTML → 隐藏 textarea
+    // ═══════════════════════════════════════════
     var form = document.getElementById('post-form');
     form.addEventListener('submit', function(){
         var html = editor.getHtml();
-        html = html.replace(/<p><br><\/p>/g, '');
-        html = html.replace(/<p>\s*<\/p>/g, '');
+        html = html.replace(/<p><br><\/p>/g, '');    // 去掉 <p><br></p>
+        html = html.replace(/<p>\s*<\/p>/g, '');    // 去掉空白段落
         editor.setHtml(html);
         document.getElementById('id_content').value = html;
     });
 
-    // ── Ctrl+S 保存草稿 ──
+    // Ctrl+S → 保存草稿
     document.addEventListener('keydown', function(e){
         if ((e.ctrlKey || e.metaKey) && e.key === 's') {
             e.preventDefault();
