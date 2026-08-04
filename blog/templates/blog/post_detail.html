@@ -29,7 +29,7 @@
 
     <!-- 正文 — 宽行距，舒适阅读 -->
     <div style="font-size:16px;line-height:2;letter-spacing:0.015em" id="article-body">
-        {{ post.content|markdown }}
+        {% if post.content_format == 'html' %}{{ post.content|safe }}{% else %}{{ post.content|markdown }}{% endif %}
     </div>
 
     <!-- 互动 — 1px 细线分隔 -->

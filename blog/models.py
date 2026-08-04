@@ -28,6 +28,12 @@ class Post(models.Model):
         default='draft',
         verbose_name='状态',
     )
+    content_format = models.CharField(
+        max_length=10,
+        choices=[('markdown', 'Markdown'), ('html', 'HTML')],
+        default='markdown',
+        verbose_name='内容格式',
+    )
     likes = models.ManyToManyField(User, related_name='liked_posts', blank=True, verbose_name='点赞')
 
     class Meta:

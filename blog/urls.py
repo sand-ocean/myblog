@@ -17,8 +17,8 @@ urlpatterns = [
     path('import/', views.import_post, name='import_post'),
     path('setup/', views.setup_init, name='setup_init'),
 
-    # ── JSON API 路由（Apipost / Postman 用）──────
-    # 注意：API 路由都以 api/ 开头，和上面的 HTML 路由不冲突
+
+    # API 路由都以 api/ 开头
     path('api/login/', api_views.api_login, name='api_login'),
     path('api/posts/', api_views.api_post_list, name='api_post_list'),
     path('api/posts/<slug:slug>/', api_views.api_post_detail, name='api_post_detail'),

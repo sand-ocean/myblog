@@ -196,10 +196,7 @@ def api_post_list(request):
 
 @require_http_methods(["GET"])
 def api_post_detail(request, slug):
-    """
-    返回单篇文章的 JSON。
-    <slug:slug> 是 URL 路径参数，Django 自动从 URL 里提取。
-    """
+
 
     # get_object_or_404(Model, 条件)
     #   → 找到了：返回 Post 对象

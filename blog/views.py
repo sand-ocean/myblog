@@ -66,6 +66,7 @@ def post_new(request):
         if form.is_valid():
             post = form.save(commit=False)    # 暂不写入
             post.author = request.user         # 补上作者
+            post.content_format = request.POST.get('content_format', 'markdown')
             post.status = 'published' if request.POST.get('action') == 'publish' else 'draft'
             post.save()                        # 现在写入
             request.session.pop('imported_content', None)
@@ -97,13 +98,23 @@ def post_edit(request, slug):
         form = PostForm(request.POST, instance=post)
         if form.is_valid():
             post = form.save(commit=False)
+            post.content_format = request.POST.get('content_format', 'markdown')
             post.status = 'published' if request.POST.get('action') == 'publish' else 'draft'
             post.save()
             return redirect('post_list')
     else:
         form = PostForm(instance=post)         # GET → 填充已有数据
 
-    return render(request, 'blog/post_form.html', {'form': form})
+    # 如果旧文章是 Markdown，先转成 HTML 给编辑器
+    editor_content = None
+    if post.content_format == 'markdown':
+        from .templatetags.markdown_filter import markdown_filter
+        editor_content = markdown_filter(post.content)
+
+    return render(request, 'blog/post_form.html', {
+        'form': form,
+        'editor_content': editor_content,
+    })
 
 
 # ── 删除文章（需登录，只能删自己的）──────────────────
