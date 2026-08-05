@@ -80,6 +80,8 @@
                 <div id="editor-container"></div>
             </div>
 
+            <p class="label" style="text-align:right;margin-top:8px" id="char-count">0 字</p>
+
             {% comment %}
               隐藏的 textarea——Django form 通过 name="content" 接收数据，
               WangEditor 不产生 <textarea> 值，需要手动同步。
@@ -182,7 +184,6 @@
     margin: 0 2px; width: 1px; height: 14px; background: var(--hairline) !important;
 }
 /* 隐藏下拉选择器（标题层级选择等），保持纯图标 */
-#toolbar-container .w-e-bar-item .w-e-select,
 #toolbar-container .w-e-bar-item .w-e-dropdown { display: none !important; }
 
 /* ── 编辑区 ── */
@@ -218,8 +219,18 @@
         // 每次内容变化 → 同步到隐藏 textarea（Django form 要读）
         onChange(editor) {
             document.getElementById('id_content').value = editor.getHtml();
+                    localStorage.setItem("draft_content", editor.getHtml());
+
+            // ── 自动保存草稿恢复（仅新建文章）──
+            {% if not is_edit %}
+            var saved = localStorage.getItem("draft_content");
+            if (saved && editor.isEmpty()) {
+                editor.setHtml(saved);
+                document.getElementById("id_content").value = saved;
+            }
+            {% endif %}
             var count = editor.getText().replace(/\s/g, '').length;
-            document.getElementById('char-count').textContent = count.toLocaleString() + ' 字';
+            var mins = Math.max(1, Math.ceil(count / 400)); document.getElementById('char-count').textContent = count.toLocaleString() + ' 字 · 约 ' + mins + ' 分钟';
         },
 
         hoverbarKeys: {
@@ -253,13 +264,16 @@
         selector: '#toolbar-container',
         config: {
             toolbarKeys: [
-                'bold', 'italic', 'underline',           // 加粗 斜体 下划线
+                'headerSelect',                          // 正文/H1/H2/H3
                 '|',
-                'blockquote', 'code', 'bulletedList', 'numberedList',  // 引用 代码 无序/有序列表
+                'bold', 'italic', 'underline', 'through', // B I U S
                 '|',
-                'insertLink',                            // 插入链接
+                'blockquote', 'code', 'codeBlock',        // 引用 行内码 代码块
+                'bulletedList', 'numberedList',           // 列表
                 '|',
-                'undo', 'redo',                          // 撤销 重做
+                'insertLink', 'divider',                  // 链接 分隔线
+                '|',
+                'undo', 'redo', 'fullScreen',             // 撤销 重做 全屏
                 '|',
                 'clearStyle',                            // 清除格式
             ],
@@ -373,6 +387,7 @@
         html = html.replace(/<p>\s*<\/p>/g, '');    // 去掉空白段落
         editor.setHtml(html);
         document.getElementById('id_content').value = html;
+        localStorage.removeItem("draft_content");
     });
 
     // Ctrl+S → 保存草稿
