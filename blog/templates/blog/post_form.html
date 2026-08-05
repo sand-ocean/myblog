@@ -218,9 +218,21 @@
         // 每次内容变化 → 同步到隐藏 textarea（Django form 要读）
         onChange(editor) {
             document.getElementById('id_content').value = editor.getHtml();
-        }
-    };
+            var count = editor.getText().replace(/\s/g, '').length;
+            document.getElementById('char-count').textContent = count.toLocaleString() + ' 字';
+        },
 
+        hoverbarKeys: {
+            image: { menuKeys: ['editImage', 'deleteImage', 'viewImageLink'] },
+            link: { menuKeys: ['editLink', 'unLink', 'viewLink'] },
+        },
+        customPaste(editor, event) {
+            var text = (event.clipboardData || window.clipboardData).getData('text/plain');
+            if (text) { editor.insertText(text); event.preventDefault(); return false; }
+            return true;
+        }
+
+    };
     // createEditor：挂载编辑器到 #editor-container
     // html: '<p><br></p>' 是官方推荐的空编辑器的初始 HTML
     // mode: 'default' = 全功能模式，'simple' = 简洁模式
