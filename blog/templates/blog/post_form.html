@@ -199,6 +199,18 @@
     padding: 14px 16px; min-height: 360px;
     font-size: 15px; line-height: 1.8; color: var(--ink);
 }
+
+/* 全屏时隐藏 navbar/footer/表单控件，只留编辑器 */
+body.editor-fullscreen header,
+body.editor-fullscreen footer,
+body.editor-fullscreen .narrow > .label,
+body.editor-fullscreen .narrow > p,
+body.editor-fullscreen .narrow > div:not(:has(#editor-wrapper)),
+body.editor-fullscreen .narrow > hr,
+body.editor-fullscreen .narrow > a { display: none !important; }
+body.editor-fullscreen .narrow { max-width: none; }
+body.editor-fullscreen #editor-wrapper { border: none; border-radius: 0; }
+body.editor-fullscreen #editor-container .w-e-text-container [data-slate-editor] { min-height: calc(100vh - 32px); }
 </style>
 
 {% comment %}─── JS 依赖：WangEditor + Cloudinary───{% endcomment %}
@@ -271,6 +283,10 @@
         },
         mode: 'default',
     });
+
+    // ── 全屏时隐藏表单元素 ──
+    editor.on('fullScreen', function() { document.body.classList.add('editor-fullscreen'); });
+    editor.on('unFullScreen', function() { document.body.classList.remove('editor-fullscreen'); });
 
     // ═══════════════════════════════════════════
     //  第 3 步：填入初始内容（编辑模式）
