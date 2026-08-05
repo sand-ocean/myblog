@@ -200,17 +200,6 @@
     font-size: 15px; line-height: 1.8; color: var(--ink);
 }
 
-/* 全屏时隐藏 navbar/footer/表单控件，只留编辑器 */
-body.editor-fullscreen header,
-body.editor-fullscreen footer,
-body.editor-fullscreen .narrow > .label,
-body.editor-fullscreen .narrow > p,
-body.editor-fullscreen .narrow > div:not(:has(#editor-wrapper)),
-body.editor-fullscreen .narrow > hr,
-body.editor-fullscreen .narrow > a { display: none !important; }
-body.editor-fullscreen .narrow { max-width: none; }
-body.editor-fullscreen #editor-wrapper { border: none; border-radius: 0; }
-body.editor-fullscreen #editor-container .w-e-text-container [data-slate-editor] { min-height: calc(100vh - 32px); }
 </style>
 
 {% comment %}─── JS 依赖：WangEditor + Cloudinary───{% endcomment %}
@@ -284,9 +273,22 @@ body.editor-fullscreen #editor-container .w-e-text-container [data-slate-editor]
         mode: 'default',
     });
 
-    // ── 全屏时隐藏表单元素 ──
-    editor.on('fullScreen', function() { document.body.classList.add('editor-fullscreen'); });
-    editor.on('unFullScreen', function() { document.body.classList.remove('editor-fullscreen'); });
+    // ── 全屏时隐藏所有非编辑器元素 ──
+    function toggleFullscreenUI(hide) {
+        var sel = 'header, footer, .narrow > .label, .narrow > p, .narrow > div[style*=\"margin-bottom:32\"], ' +
+                  '.narrow > div[style*=\"margin-bottom:48\"], .narrow > hr, .narrow > div:last-of-type';
+        document.querySelectorAll(sel).forEach(function(el) { el.style.display = hide ? 'none' : ''; });
+        // 编辑器 wrapper 去掉边框全屏
+        var wrapper = document.getElementById('editor-wrapper');
+        if (wrapper) { wrapper.style.border = hide ? 'none' : ''; wrapper.style.borderRadius = hide ? '0' : ''; }
+        var narrow = document.querySelector('.narrow');
+        if (narrow) narrow.style.maxWidth = hide ? 'none' : '';
+        // 展开编辑器高度
+        var editor = document.querySelector('#editor-container [data-slate-editor]');
+        if (editor) editor.style.minHeight = hide ? 'calc(100vh - 32px)' : '';
+    }
+    editor.on('fullScreen', function() { toggleFullscreenUI(true); });
+    editor.on('unFullScreen', function() { toggleFullscreenUI(false); });
 
     // ═══════════════════════════════════════════
     //  第 3 步：填入初始内容（编辑模式）
