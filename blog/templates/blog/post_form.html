@@ -219,16 +219,7 @@
         // 每次内容变化 → 同步到隐藏 textarea（Django form 要读）
         onChange(editor) {
             document.getElementById('id_content').value = editor.getHtml();
-                    localStorage.setItem("draft_content", editor.getHtml());
-
-            // ── 自动保存草稿恢复（仅新建文章）──
-            {% if not is_edit %}
-            var saved = localStorage.getItem("draft_content");
-            if (saved && editor.isEmpty()) {
-                editor.setHtml(saved);
-                document.getElementById("id_content").value = saved;
-            }
-            {% endif %}
+            localStorage.setItem("draft_content", editor.getHtml());
             var count = editor.getText().replace(/\s/g, '').length;
             var mins = Math.max(1, Math.ceil(count / 400)); document.getElementById('char-count').textContent = count.toLocaleString() + ' 字 · 约 ' + mins + ' 分钟';
         },
@@ -298,6 +289,15 @@
     {% endif %}
     // 初始化隐藏 textarea 的值
     document.getElementById('id_content').value = editor.getHtml();
+
+    // ── 自动保存草稿恢复（仅新建文章）──
+    {% if not is_edit %}
+    var saved = localStorage.getItem("draft_content");
+    if (saved && editor.isEmpty()) {
+        editor.setHtml(saved);
+        document.getElementById("id_content").value = saved;
+    }
+    {% endif %}
 
     // ═══════════════════════════════════════════
     //  Slug 自动生成
