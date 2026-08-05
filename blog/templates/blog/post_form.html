@@ -11,18 +11,18 @@
 <div class="narrow">
 
     <!-- 页面标题：编辑文章 or 新文章 -->
-    <p class="label" style="margin-bottom:12px">
+    <p class="label fs-hide" style="margin-bottom:12px">
         {% if is_edit %}编辑文章{% else %}新文章{% endif %}
     </p>
 
     <!-- 文件导入提示：显示导入的文件名 + 重新导入链接 -->
     {% if imported_filename %}
-    <p style="font-size:12px;margin-bottom:24px;color:var(--soft)">
+    <p class="fs-hide" style="font-size:12px;margin-bottom:24px;color:var(--soft)">
         📄 从 <em>{{ imported_filename }}</em> 导入&ensp;
         <a href="{% url 'import_post' %}">重新导入</a>
     </p>
     {% elif not is_edit %}
-    <p style="font-size:12px;margin-bottom:32px">
+    <p class="fs-hide" style="font-size:12px;margin-bottom:32px">
         <a href="{% url 'import_post' %}" style="color:var(--soft)">📎 从文件导入（PDF/Word/PPT → 自动转正文）</a>
     </p>
     {% endif %}
@@ -41,13 +41,13 @@
         {% endif %}
 
         <!-- ─── 标题字段 ─── -->
-        <div style="margin-bottom:32px">
+        <div class="fs-hide" style="margin-bottom:32px">
             <input type="text" name="title" id="id_title" value="{{ form.title.value|default:'' }}" required maxlength="200"
                    placeholder="标题" style="font-size:20px">
         </div>
 
         <!-- ─── Slug 字段（URL 友好的短链接）─── -->
-        <div style="margin-bottom:32px">
+        <div class="fs-hide" style="margin-bottom:32px">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
                 <span class="label">链接</span>
                 <!-- 自动生成 badge：标题变化时 JS 自动填 slug -->
@@ -63,7 +63,7 @@
         <!-- ═══════════════════════════════════════ -->
         <div style="margin-bottom:48px">
             <!-- Cloudinary 图片上传按钮 + 上传成功反馈 -->
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+            <div class="fs-hide" style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
                 <button type="button" id="upload-image-btn" class="fmt-btn" title="上传图片到光标位置">📷 上传图片</button>
                 <span id="upload-toast" style="font-size:10px;color:var(--accent);opacity:0;transition:opacity .3s">✓ 已上传</span>
             </div>
@@ -90,7 +90,7 @@
         </div>
 
         <!-- ─── 分类选择 + 发布状态 ─── -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:48px">
+        <div class="fs-hide" style="display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:48px">
             <div>
                 <p class="label" style="margin-bottom:12px">分类</p>
                 <select name="category" id="id_category">
@@ -114,9 +114,9 @@
             </div>
         </div>
 
-        <hr>
+        <hr class="fs-hide">
         <!-- ─── 操作按钮 ─── -->
-        <div style="display:flex;gap:16px">
+        <div class="fs-hide" style="display:flex;gap:16px">
             <button type="submit" name="action" value="draft" class="btn">存草稿</button>
             <button type="submit" name="action" value="publish" class="btn btn-primary">发布</button>
             <a href="{% if is_edit %}{% url 'post_detail' form.instance.slug %}{% else %}{% url 'post_list' %}{% endif %}"
@@ -273,19 +273,16 @@
         mode: 'default',
     });
 
-    // ── 全屏时隐藏所有非编辑器元素 ──
+    // ── 全屏：隐藏 .fs-hide 元素 + 展开编辑器 ──
     function toggleFullscreenUI(hide) {
-        var sel = 'header, footer, .narrow > .label, .narrow > p, .narrow > div[style*=\"margin-bottom:32\"], ' +
-                  '.narrow > div[style*=\"margin-bottom:48\"], .narrow > hr, .narrow > div:last-of-type';
-        document.querySelectorAll(sel).forEach(function(el) { el.style.display = hide ? 'none' : ''; });
-        // 编辑器 wrapper 去掉边框全屏
+        document.querySelectorAll('.fs-hide').forEach(function(el) { el.style.display = hide ? 'none' : ''; });
+        document.querySelector('header').style.display = hide ? 'none' : '';
+        document.querySelector('footer').style.display = hide ? 'none' : '';
         var wrapper = document.getElementById('editor-wrapper');
         if (wrapper) { wrapper.style.border = hide ? 'none' : ''; wrapper.style.borderRadius = hide ? '0' : ''; }
-        var narrow = document.querySelector('.narrow');
-        if (narrow) narrow.style.maxWidth = hide ? 'none' : '';
-        // 展开编辑器高度
-        var editor = document.querySelector('#editor-container [data-slate-editor]');
-        if (editor) editor.style.minHeight = hide ? 'calc(100vh - 32px)' : '';
+        document.querySelector('.narrow').style.maxWidth = hide ? 'none' : '';
+        var ed = document.querySelector('#editor-container [data-slate-editor]');
+        if (ed) ed.style.minHeight = hide ? 'calc(100vh - 32px)' : '';
     }
     editor.on('fullScreen', function() { toggleFullscreenUI(true); });
     editor.on('unFullScreen', function() { toggleFullscreenUI(false); });
