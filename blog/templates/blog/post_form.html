@@ -46,8 +46,8 @@
                    placeholder="标题" style="font-size:20px">
         </div>
 
-        <!-- ─── Slug 字段（URL 友好的短链接）─── -->
-        <div class="fs-hide" style="margin-bottom:32px">
+        <!-- Slug 自动生成，用户不可见 -->
+        <div class="fs-hide" style="display:none">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
                 <span class="label">链接</span>
                 <!-- 自动生成 badge：标题变化时 JS 自动填 slug -->
@@ -232,7 +232,6 @@
         // 每次内容变化 → 同步到隐藏 textarea（Django form 要读）
         onChange(editor) {
             document.getElementById('id_content').value = editor.getHtml();
-            localStorage.setItem("draft_content", editor.getHtml());
             var count = editor.getText().replace(/\s/g, '').length;
             var mins = Math.max(1, Math.ceil(count / 400)); document.getElementById('char-count').textContent = count.toLocaleString() + ' 字 · 约 ' + mins + ' 分钟';
         },
@@ -317,14 +316,6 @@
     // 初始化隐藏 textarea 的值
     document.getElementById('id_content').value = editor.getHtml();
 
-    // ── 自动保存草稿恢复（仅新建文章）──
-    {% if not is_edit %}
-    var saved = localStorage.getItem("draft_content");
-    if (saved && editor.isEmpty()) {
-        editor.setHtml(saved);
-        document.getElementById("id_content").value = saved;
-    }
-    {% endif %}
 
     // ═══════════════════════════════════════════
 
@@ -358,8 +349,6 @@
         var now = new Date();
         var pad = function(n){ return n < 10 ? '0'+n : ''+n; };
         var datePrefix = now.getFullYear() + '-' + pad(now.getMonth()+1) + '-' + pad(now.getDate());
-        var cn = eng.match(/[一-鿿]/g);
-        if (cn && cn.length <= 8) return datePrefix + '-' + cn.join('');
         return datePrefix;
     }
 
@@ -423,7 +412,6 @@
         html = html.replace(/<p>\s*<\/p>/g, '');    // 去掉空白段落
         editor.setHtml(html);
         document.getElementById('id_content').value = html;
-        localStorage.removeItem("draft_content");
     });
 
     // Ctrl+S → 保存草稿
