@@ -344,11 +344,12 @@
         var suffix = pad(now.getHours()) + pad(now.getMinutes());
         var eng = text.replace(/[^a-zA-Z0-9一-鿿\s-]/g, '');
         var engOnly = eng.replace(/[一-鿿]/g, '').trim();
+        var rand = Math.random().toString(36).substring(2, 6);
         if (engOnly.length >= 3) {
-            return engOnly.toLowerCase().replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') + '-' + suffix;
+            return engOnly.toLowerCase().replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') + '-' + suffix + '-' + rand;
         }
         var datePrefix = now.getFullYear() + '-' + pad(now.getMonth()+1) + '-' + pad(now.getDate());
-        return datePrefix + '-' + suffix;
+        return datePrefix + '-' + suffix + '-' + rand;
     }
 
     function updateSlug() {
