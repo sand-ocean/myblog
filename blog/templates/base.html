@@ -78,6 +78,8 @@
                 {% if user.is_authenticated %}
                     <a href="{% url 'post_new' %}">写文章</a>
                     <span class="text-[var(--soft)]" style="font-size:10px">·</span>
+                    <a href="{% url 'drafts' %}">草稿箱</a>
+                    <span class="text-[var(--soft)]" style="font-size:10px">·</span>
                     <span class="text-[var(--soft)]">{{ user.username }}</span>
                     <form method="post" action="{% url 'logout' %}" style="display:inline">
                         {% csrf_token %}

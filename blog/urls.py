@@ -15,6 +15,7 @@ urlpatterns = [
     path('post/<slug:slug>/like/', views.like_post, name='like_post'),
     path('category/<slug:slug>/', views.category_posts, name='category_posts'),
     path('import/', views.import_post, name='import_post'),
+    path('drafts/', views.drafts, name='drafts'),
     path('setup/', views.setup_init, name='setup_init'),
 
 

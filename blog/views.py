@@ -24,9 +24,11 @@ def register(request):
 
 # ── 首页（所有人可看）──────────────────
 def post_list(request):
-    """已登录看全部，未登录只看已发布"""
+    """已登录看已发布+自己的草稿；未登录只看已发布"""
     if request.user.is_authenticated:
-        posts = Post.objects.all()
+        posts = Post.objects.filter(
+            Q(status='published') | (Q(status='draft') & Q(author=request.user))
+        )
     else:
         posts = Post.objects.filter(status='published')
     posts = posts.order_by('-created_at')
@@ -135,10 +137,14 @@ def post_delete(request, slug):
 
 # ── 按分类筛选 ──────────────────
 def category_posts(request, slug):
-    """展示某个分类下的所有文章（未登录只看已发布）"""
+    """已登录看已发布+自己的草稿；未登录只看已发布"""
     category = get_object_or_404(Category, slug=slug)
     posts = Post.objects.filter(category=category)
-    if not request.user.is_authenticated:
+    if request.user.is_authenticated:
+        posts = posts.filter(
+            Q(status='published') | (Q(status='draft') & Q(author=request.user))
+        )
+    else:
         posts = posts.filter(status='published')
     posts = posts.order_by('-created_at')
     return render(request, 'blog/category_posts.html', {
@@ -223,5 +229,18 @@ def setup_init(request):
         msg.append(f'分类 {n} {"已创建" if created else "已存在"}')
 
     return HttpResponse('<br>'.join(msg) + '<br><br><a href="/">去首页</a>')
+
+
+# ── 草稿箱（仅自己可见）──────────────────
+@login_required
+def drafts(request):
+    """只显示当前用户的草稿"""
+    posts = Post.objects.filter(author=request.user, status='draft').order_by('-created_at')
+    paginator = Paginator(posts, 20)
+    page_obj = paginator.get_page(request.GET.get('page', 1))
+    return render(request, 'blog/post_list.html', {
+        'page_obj': page_obj,
+        'draft_box': True,
+    })
 
 
