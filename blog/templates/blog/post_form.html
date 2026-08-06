@@ -338,18 +338,17 @@
     var autoSlug = true, userTouched = false;
 
     function slugify(text) {
-        // 只保留英文、数字、中文、空格、连字符
-        var eng = text.replace(/[^a-zA-Z0-9一-鿿\s-]/g, '');
-        // 如果英文部分 ≥ 3 个字符 → 用它做 slug
-        var engOnly = eng.replace(/[一-鿿]/g, '').trim();
-        if (engOnly.length >= 3) {
-            return engOnly.toLowerCase().replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
-        }
-        // 纯中文标题 → 用日期做 slug
         var now = new Date();
         var pad = function(n){ return n < 10 ? '0'+n : ''+n; };
+        // 时间后缀 HHMM，保证同一天多篇不重名
+        var suffix = pad(now.getHours()) + pad(now.getMinutes());
+        var eng = text.replace(/[^a-zA-Z0-9一-鿿\s-]/g, '');
+        var engOnly = eng.replace(/[一-鿿]/g, '').trim();
+        if (engOnly.length >= 3) {
+            return engOnly.toLowerCase().replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') + '-' + suffix;
+        }
         var datePrefix = now.getFullYear() + '-' + pad(now.getMonth()+1) + '-' + pad(now.getDate());
-        return datePrefix;
+        return datePrefix + '-' + suffix;
     }
 
     function updateSlug() {
