@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Post, Category, Comment
+from .models import Post, Category, Comment, UserProfile
 
 
 @admin.register(Category)
@@ -27,3 +27,8 @@ class CommentAdmin(admin.ModelAdmin):
     def truncated_content(self, obj):
         return obj.content[:60]
     truncated_content.short_description = '内容'
+
+
+@admin.register(UserProfile)
+class UserProfileAdmin(admin.ModelAdmin):
+    list_display = ['user', 'avatar']

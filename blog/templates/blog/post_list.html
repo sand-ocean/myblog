@@ -41,6 +41,9 @@
             <!-- 卡片正文 -->
             <div class="card-body">
                 <div class="card-meta">
+                    {% if post.author.profile.avatar %}
+                        <img src="{{ post.author.profile.avatar }}" alt="" style="width:14px;height:14px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:2px">
+                    {% endif %}
                     <span>{{ post.author.username }}</span>
                     <span aria-hidden="true">·</span>
                     <span>{{ post.category.name }}</span>

@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
-from .models import Post, Category
+from .models import Post, Category, UserProfile
 from .forms import PostForm, CommentForm
 from django.db.models import Q
 from django.core.paginator import Paginator
@@ -232,6 +232,20 @@ def setup_init(request):
         msg.append(f'分类 {n} {"已创建" if created else "已存在"}')
 
     return HttpResponse('<br>'.join(msg) + '<br><br><a href="/">去首页</a>')
+
+
+# ── 个人设置（头像）──
+@login_required
+def profile(request):
+    """GET=显示头像  POST=保存头像URL"""
+    profile_obj, _ = UserProfile.objects.get_or_create(user=request.user)
+    if request.method == 'POST':
+        avatar_url = request.POST.get('avatar', '').strip()
+        if avatar_url:
+            profile_obj.avatar = avatar_url
+            profile_obj.save()
+        return redirect('profile')
+    return render(request, 'blog/profile.html', {'profile': profile_obj})
 
 
 # ── 草稿箱（仅自己可见）──────────────────

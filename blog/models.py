@@ -45,6 +45,15 @@ class Post(models.Model):
         return self.title
 
 
+class UserProfile(models.Model):
+    """用户资料——头像"""
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    avatar = models.URLField(blank=True, default='', verbose_name='头像URL')
+
+    def __str__(self):
+        return self.user.username
+
+
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments', verbose_name='文章')
     author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='作者')
