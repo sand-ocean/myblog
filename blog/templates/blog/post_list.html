@@ -1,9 +1,14 @@
 {% extends 'base.html' %}
 {% load markdown_filter %}
-{% block title %}mineblog{% endblock %}
+{% block title %}{% if draft_box %}草稿箱{% else %}mineblog{% endif %}{% endblock %}
 {% block content %}
 
+{% if draft_box %}
+    <p class="label" style="margin-bottom:32px">草稿箱</p>
+{% endif %}
+
 <!-- 搜索 -->
+{% if not draft_box %}
 <form method="get" style="margin-bottom: 48px">
     <input type="search" name="q" value="{{ request.GET.q }}" placeholder="搜索" aria-label="搜索文章"
            style="max-width: 320px">
@@ -13,12 +18,17 @@
         搜索「{{ request.GET.q }}」&ensp;·&ensp;<a href="{% url 'post_list' %}">清除</a>
     </p>
 {% endif %}
+{% endif %}
 
 <!-- 卡片流 -->
 <div class="card-grid">
 {% for post in page_obj %}
     <article class="card fade">
+        {% if post.status == 'draft' and user == post.author %}
+        <a href="{% url 'post_edit' post.slug %}" class="card-link">
+        {% else %}
         <a href="{% url 'post_detail' post.slug %}" class="card-link">
+        {% endif %}
             <!-- 封面图 -->
             {% with cover=post.content|first_image %}
             {% if cover %}
