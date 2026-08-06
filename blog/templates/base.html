@@ -80,9 +80,11 @@
                     <span class="text-[var(--soft)]" style="font-size:10px">·</span>
                     <a href="{% url 'drafts' %}">草稿箱</a>
                     <span class="text-[var(--soft)]" style="font-size:10px">·</span>
-                    {% if user.profile.avatar %}
-                        <img src="{{ user.profile.avatar }}" alt="" style="width:18px;height:18px;border-radius:50%;object-fit:cover;vertical-align:middle">
-                    {% endif %}
+                    <a href="{% url 'profile' %}">
+                        {% if user.profile.avatar %}
+                            <img src="{{ user.profile.avatar }}" alt="" style="width:18px;height:18px;border-radius:50%;object-fit:cover;vertical-align:middle">
+                        {% endif %}
+                    </a>
                     <a href="{% url 'profile' %}" class="text-[var(--soft)] hover:text-[var(--ink)]">{{ user.username }}</a>
                     <form method="post" action="{% url 'logout' %}" style="display:inline">
                         {% csrf_token %}
