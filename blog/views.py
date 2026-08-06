@@ -75,8 +75,11 @@ def post_new(request):
             request.session.pop('imported_filename', None)
             return redirect('post_list')
     else:
-        # 从文件导入预填内容
+        # 从文件导入预填内容 + 默认选中第一个分类
         initial = {}
+        first_cat = Category.objects.first()
+        if first_cat:
+            initial['category'] = first_cat
         imported = request.session.get('imported_content')
         if imported:
             initial['content'] = imported
