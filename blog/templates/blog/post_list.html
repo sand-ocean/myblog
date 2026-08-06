@@ -41,6 +41,8 @@
             <!-- 卡片正文 -->
             <div class="card-body">
                 <div class="card-meta">
+                    <span>{{ post.author.username }}</span>
+                    <span aria-hidden="true">·</span>
                     <span>{{ post.category.name }}</span>
                     <span aria-hidden="true">·</span>
                     <span>{{ post.created_at|date:"Y.m.d" }}</span>
